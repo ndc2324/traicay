@@ -1,0 +1,313 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Fruit - Quản trị</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="admin-app" id="admin">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon"><i class="fas fa-leaf"></i></div>
+            <div>
+                <h1>Fresh Fruit</h1>
+                <p>Dashbord</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="sidebar-link active" onclick="showAdminTab('dashboard', event)"><i class="fas fa-chart-line"></i> Dashboard</button>
+            <button class="sidebar-link" onclick="showAdminTab('products', event)"><i class="fas fa-box-open"></i> Sản phẩm</button>
+            <button class="sidebar-link" onclick="showAdminTab('orders', event)"><i class="fas fa-shopping-basket"></i> Đơn hàng</button>
+            <button class="sidebar-link" onclick="showAdminTab('categories', event)"><i class="fas fa-tags"></i> Danh mục</button>
+            <button class="sidebar-link" onclick="showAdminTab('settings', event)"><i class="fas fa-cog"></i> Cài đặt</button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+        </div>
+    </aside>
+
+    <div class="main-panel">
+        <header class="topbar">
+            <div class="topbar-left">
+                <h2 id="page-title">Tổng quan</h2>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="admin-search" placeholder="Tìm kiếm sản phẩm, đơn hàng..." oninput="adminSearch(this.value)">
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="top-action">
+                    <button class="btn-secondary" onclick="loadAdminDashboard()"><i class="fas fa-sync-alt"></i> Làm mới</button>
+                </div>
+                <div class="user-card">
+                    <span>Admin</span>
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&q=80" alt="Admin">
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <section id="admin-dashboard" class="panel active">
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <h3>Tổng sản phẩm</h3>
+                        <p id="stat-products" class="stat-number">0</p>
+                        <span class="stat-caption">Số sản phẩm đang quản lý</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Đơn hàng</h3>
+                        <p id="stat-orders" class="stat-number">0</p>
+                        <span class="stat-caption">Tổng đơn hiện có</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Doanh thu</h3>
+                        <p id="stat-revenue" class="stat-number">0đ</p>
+                        <span class="stat-caption">Doanh thu dự kiến</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Khách hàng mới</h3>
+                        <p id="stat-customers" class="stat-number">0</p>
+                        <span class="stat-caption">Khách hàng mới trong tháng</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-panel">
+                    <div class="dashboard-summary">
+                        <div>
+                            <h4>Tổng hợp nhanh</h4>
+                            <p>Trang tổng quan giúp bạn theo dõi nhanh các chỉ số bán hàng, đơn hàng và trạng thái tồn kho.</p>
+                        </div>
+                        <div class="dashboard-metrics">
+                            <div>
+                                <span>Chuyển đổi</span>
+                                <strong id="stat-conversion">0%</strong>
+                            </div>
+                            <div>
+                                <span>Đơn đang xử lý</span>
+                                <strong id="stat-pending-orders">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="admin-products" class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Danh sách sản phẩm</h2>
+                        <p>Quản lý, sửa, xóa và thêm mới sản phẩm.</p>
+                    </div>
+                    <button class="btn-primary" onclick="showAddProductForm()">+ Thêm sản phẩm</button>
+                </div>
+                <div class="table-card">
+                    <table class="admin-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Sản phẩm</th>
+                            <th>Giá</th>
+                            <th>Tồn kho</th>
+                            <th>Danh mục</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="products-list">
+                        <tr><td colspan="7">Không có dữ liệu</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="admin-orders" class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Danh sách đơn hàng</h2>
+                        <p>Xem chi tiết, cập nhật trạng thái và theo dõi đơn hàng.</p>
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn-secondary" onclick="loadAdminOrders('ALL')">Tất cả</button>
+                        <button class="btn-secondary" onclick="loadAdminOrders('PENDING')">Chờ xử lý</button>
+                        <button class="btn-secondary" onclick="loadAdminOrders('SHIPPED')">Đang giao</button>
+                    </div>
+                </div>
+                <div class="table-card">
+                    <table class="admin-table">
+                        <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Khách hàng</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày đặt</th>
+                            <th>Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="orders-list">
+                        <tr><td colspan="6">Không có dữ liệu</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="admin-categories" class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Danh mục</h2>
+                        <p>Quản lý các danh mục sản phẩm.</p>
+                    </div>
+                    <button class="btn-primary" onclick="showAddCategoryForm()">+ Thêm danh mục</button>
+                </div>
+                <div class="table-card">
+                    <table class="admin-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên danh mục</th>
+                            <th>Mô tả</th>
+                            <th>Số sản phẩm</th>
+                            <th>Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody id="categories-list">
+                        <tr><td colspan="5">Không có dữ liệu</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="admin-settings" class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Cài đặt</h2>
+                        <p>Các tùy chọn cấu hình và thông tin quản trị.</p>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <p>Trang cài đặt đang được phát triển. Bạn có thể thêm các tùy chỉnh hệ thống tại đây.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<div class="modal" id="product-modal">
+    <div class="modal-backdrop" onclick="closeProductModal()"></div>
+    <div class="modal-card">
+        <div class="modal-header">
+            <div>
+                <h3 id="product-modal-title">Thêm sản phẩm</h3>
+                <p>Điền đầy đủ dữ liệu sản phẩm để lưu vào danh sách.</p>
+            </div>
+            <button class="btn-close" type="button" onclick="closeProductModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="product-form" onsubmit="submitProductForm(event)">
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="product-name">Tên sản phẩm</label>
+                        <input id="product-name" type="text" placeholder="Nhập tên sản phẩm" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Giá</label>
+                        <input id="product-price" type="number" step="0.01" placeholder="Nhập giá" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-origin">Xuất xứ</label>
+                        <input id="product-origin" type="text" placeholder="Nhập xuất xứ" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-quantity">Tồn kho</label>
+                        <input id="product-quantity" type="number" placeholder="Nhập số lượng" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Danh mục</label>
+                        <select id="product-category" required>
+                            <option value="">Chọn danh mục</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-available">Trạng thái</label>
+                        <select id="product-available" required>
+                            <option value="true">Có sẵn</option>
+                            <option value="false">Hết hàng</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-fullwidth">
+                        <label for="product-image-url">URL ảnh</label>
+                        <input id="product-image-url" type="text" placeholder="Nhập đường dẫn ảnh hoặc để trống" />
+                    </div>
+                    <div class="form-group form-fullwidth">
+                        <label for="product-description">Mô tả</label>
+                        <textarea id="product-description" placeholder="Nhập mô tả sản phẩm" required></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeProductModal()">Hủy</button>
+                <button type="submit" class="btn-primary">Lưu sản phẩm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="order-detail-modal">
+    <div class="modal-backdrop" onclick="closeOrderDetail()"></div>
+    <div class="modal-card">
+        <div class="modal-header">
+            <div>
+                <h3>Chi tiết đơn hàng</h3>
+                <p id="order-detail-code">Mã đơn: -</p>
+            </div>
+            <button class="btn-close" onclick="closeOrderDetail()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-grid">
+                <div class="detail-box">
+                    <span>Khách hàng</span>
+                    <strong id="order-detail-customer">-</strong>
+                </div>
+                <div class="detail-box">
+                    <span>Trạng thái</span>
+                    <strong id="order-detail-status">-</strong>
+                </div>
+                <div class="detail-box">
+                    <span>Ngày đặt</span>
+                    <strong id="order-detail-date">-</strong>
+                </div>
+                <div class="detail-box">
+                    <span>Tổng tiền</span>
+                    <strong id="order-detail-total">-</strong>
+                </div>
+            </div>
+            <div class="order-items-panel">
+                <h4>Sản phẩm trong đơn</h4>
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                    </thead>
+                    <tbody id="order-detail-items">
+                    <tr><td colspan="3">Không có dữ liệu</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeOrderDetail()">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>

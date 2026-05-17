@@ -1,0 +1,824 @@
+// ==================== BANNER SLIDER ====================
+let currentSlideIndex = 0;
+
+function changeSlide(n) {
+    showSlide(currentSlideIndex += n);
+}
+
+function currentSlide(n) {
+    showSlide(currentSlideIndex = n);
+}
+
+function showSlide(n) {
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    if (slides.length === 0) return;
+
+    if (n >= slides.length) currentSlideIndex = 0;
+    if (n < 0) currentSlideIndex = slides.length - 1;
+
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+    slides[currentSlideIndex].classList.add('active');
+    dots[currentSlideIndex].classList.add('active');
+}
+
+setInterval(() => {
+    const slides = document.querySelectorAll('.slide');
+    if (slides.length > 0) changeSlide(1);
+}, 5000);
+
+
+// ==================== STATE ====================
+let cart = [];
+let productsFromDb = [];
+let currentUser = null;
+let authToken = null;
+let quickBuyProductId = null;
+let featuredOffset = 0;
+const FEATURED_PER_PAGE = 4;
+
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', function () {
+    // Navigation links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            navigateTo(this.getAttribute('data-page'));
+        });
+    });
+
+    // Cart icon
+    document.querySelector('.cart-icon')?.addEventListener('click', () => navigateTo('cart'));
+
+    // User icon → chỉ dùng handleUserIconClick, không dùng toggleUserMenu
+    document.getElementById('user-avatar-btn')?.addEventListener('click', handleUserIconClick);
+
+    // FAB chat
+    document.querySelector('.fab-chat')?.addEventListener('click', () => {
+        alert('Tính năng chat sẽ được cập nhật sau!');
+    });
+
+    // Forms
+    document.getElementById('login-form')?.addEventListener('submit', handleLogin);
+    document.getElementById('register-form')?.addEventListener('submit', handleRegister);
+    document.getElementById('profile-form')?.addEventListener('submit', handleProfileUpdate);
+
+    // Popup
+    setTimeout(showPopup, 3000);
+
+    // Load data
+    loadCart();
+    loadUser();
+    loadProductsFromDb();
+});
+
+
+// ==================== NAVIGATION ====================
+function navigateTo(page) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(page)?.classList.add('active');
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('data-page') === page) link.classList.add('active');
+    });
+
+    // Ẩn/hiện nav "Thanh toán"
+    const checkoutNavItem = document.getElementById('checkout-nav-item');
+    if (checkoutNavItem) {
+        checkoutNavItem.style.display = page === 'checkout' ? 'block' : 'none';
+    }
+
+    if (page === 'cart') renderCart();
+    if (page === 'checkout') renderCheckout();
+    if (page === 'profile') {
+        if (!currentUser) {
+            alert('Vui lòng đăng nhập để xem hồ sơ');
+            navigateTo('login');
+            return;
+        }
+        renderProfile();
+    }
+
+    window.scrollTo(0, 0);
+}
+
+
+// ==================== USER AUTH ====================
+function loadUser() {
+    const savedUser = localStorage.getItem('currentUser');
+    const savedToken = localStorage.getItem('authToken');
+    if (savedUser && savedToken) {
+        currentUser = JSON.parse(savedUser);
+        authToken = savedToken;
+        updateUserUI();
+    }
+}
+
+function saveUser() {
+    if (currentUser && authToken) {
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        localStorage.setItem('authToken', authToken);
+    }
+}
+
+function updateUserUI() {
+    const profileLink = document.getElementById('profile-link');
+    const defaultIcon = document.getElementById('user-icon-default');
+    const avatarImg = document.getElementById('user-avatar-img');
+
+    if (currentUser) {
+        if (profileLink) profileLink.style.display = 'block';
+        if (defaultIcon) defaultIcon.style.display = 'none';
+        if (avatarImg) {
+            avatarImg.src = currentUser.avatarUrl || 'assets/images/default-avatar.png';
+            avatarImg.style.display = 'block';
+        }
+    } else {
+        if (profileLink) profileLink.style.display = 'none';
+        if (defaultIcon) defaultIcon.style.display = 'block';
+        if (avatarImg) avatarImg.style.display = 'none';
+    }
+}
+
+// Click vào icon user trên header
+function handleUserIconClick() {
+    if (currentUser) {
+        navigateTo('profile');
+    } else {
+        navigateTo('login');
+    }
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+
+    fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Đăng nhập thất bại');
+        return res.json();
+    })
+    .then(data => {
+        currentUser = {
+            username: data.username,
+            role: data.role,
+            userId: data.userId,
+            fullName: data.fullName,
+            email: data.email,
+            phone: data.phone || '',
+            address: data.address || '',
+            avatarUrl: data.avatarUrl || 'assets/images/default-avatar.png'
+        };
+        authToken = data.token;
+        saveUser();
+        updateUserUI();
+        alert('Đăng nhập thành công!');
+        document.getElementById('login-form').reset();
+        if (data.role && data.role.toUpperCase().includes('ADMIN')) {
+            window.location.href = '/admin.html';
+        } else {
+            navigateTo('home');
+        }
+    })
+    .catch(() => alert('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.'));
+}
+
+function handleRegister(e) {
+    e.preventDefault();
+    const username = document.getElementById('register-username').value;
+    const password = document.getElementById('register-password').value;
+    const fullName = document.getElementById('register-fullname').value;
+    const email = document.getElementById('register-email').value;
+    const phone = document.getElementById('register-phone').value;
+    const address = document.getElementById('register-address').value;
+
+    fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, fullName, email, phone, address })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Đăng ký thất bại');
+        return res.json();
+    })
+    .then(data => {
+        currentUser = {
+            username: data.username,
+            role: data.role,
+            userId: data.userId,
+            fullName: data.fullName,
+            email: data.email,
+            phone: data.phone || '',
+            address: data.address || '',
+            avatarUrl: data.avatarUrl || 'assets/images/default-avatar.png'
+        };
+        authToken = data.token;
+        saveUser();
+        updateUserUI();
+        alert('Đăng ký thành công!');
+        document.getElementById('register-form').reset();
+        navigateTo('home');
+    })
+    .catch(() => alert('Đăng ký thất bại. Vui lòng thử lại.'));
+}
+
+function logout() {
+    currentUser = null;
+    authToken = null;
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    updateUserUI();
+    alert('Đã đăng xuất');
+    navigateTo('home');
+}
+
+
+// ==================== PROFILE ====================
+function renderProfile() {
+    if (!currentUser) return;
+
+    document.getElementById('display-fullname').textContent =
+        currentUser.fullName || currentUser.username || 'Người dùng';
+    document.getElementById('user-avatar').src =
+        currentUser.avatarUrl || 'assets/images/default-avatar.png';
+    document.getElementById('profile-fullname').value = currentUser.fullName || '';
+    document.getElementById('profile-email').value = currentUser.email || '';
+    document.getElementById('profile-phone').value = currentUser.phone || '';
+    document.getElementById('profile-address').value = currentUser.address || '';
+
+    loadOrderHistory();
+}
+
+function showTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.profile-nav .nav-item').forEach(item => item.classList.remove('active'));
+
+    document.getElementById('tab-' + tabName)?.classList.add('active');
+
+    const tabIndex = ['info', 'orders', 'address', 'coupon'].indexOf(tabName);
+    const navItems = document.querySelectorAll('.profile-nav .nav-item');
+    if (navItems[tabIndex]) navItems[tabIndex].classList.add('active');
+}
+
+function handleAvatarChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const base64 = e.target.result;
+
+        // Cập nhật avatar trong sidebar profile
+        const profileAvatar = document.getElementById('user-avatar');
+        if (profileAvatar) profileAvatar.src = base64;
+
+        // Cập nhật avatar trên header
+        const headerAvatar = document.getElementById('user-avatar-img');
+        if (headerAvatar) headerAvatar.src = base64;
+
+        // Lưu vào user
+        currentUser.avatarUrl = base64;
+        saveUser();
+
+        alert('Cập nhật ảnh đại diện thành công!');
+    };
+    reader.readAsDataURL(file);
+}
+
+function handleProfileUpdate(e) {
+    e.preventDefault();
+    const fullName = document.getElementById('profile-fullname').value.trim();
+    const phone = document.getElementById('profile-phone').value.trim();
+    const address = document.getElementById('profile-address').value.trim();
+
+    // Gọi API cập nhật
+    fetch(`/api/users/${currentUser.userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + authToken
+        },
+        body: JSON.stringify({ fullName, phone, address })
+    })
+    .then(res => {
+        // Dù API thành công hay thất bại đều lưu local
+        currentUser.fullName = fullName;
+        currentUser.phone = phone;
+        currentUser.address = address;
+        saveUser();
+
+        // Cập nhật tên hiển thị
+        const displayName = document.getElementById('display-fullname');
+        if (displayName) displayName.textContent = fullName;
+
+        alert('Cập nhật thông tin thành công!');
+    })
+    .catch(() => {
+        // Fallback: lưu local nếu chưa có API
+        currentUser.fullName = fullName;
+        currentUser.phone = phone;
+        currentUser.address = address;
+        saveUser();
+
+        const displayName = document.getElementById('display-fullname');
+        if (displayName) displayName.textContent = fullName;
+
+        alert('Cập nhật thông tin thành công!');
+    });
+}
+
+function filterOrderTab(el, type) {
+    document.querySelectorAll('#tab-orders .f-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    // TODO: filter theo type khi có dữ liệu thực
+}
+
+function loadOrderHistory() {
+    if (!currentUser?.userId) return;
+
+    const orderHistory = document.getElementById('order-history');
+    if (!orderHistory) return;
+
+    orderHistory.innerHTML = '<p style="color:#aaa; padding:20px;">Đang tải đơn hàng...</p>';
+
+    fetch(`/api/orders/user/${currentUser.userId}`, {
+        headers: { 'Authorization': 'Bearer ' + authToken }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Lỗi tải đơn hàng');
+        return res.json();
+    })
+    .then(orders => {
+        if (!orders || orders.length === 0) {
+            orderHistory.innerHTML = `
+                <div class="empty-data-msg">
+                    <i class="fas fa-box-open"></i>
+                    <p>Chưa có đơn hàng nào</p>
+                </div>`;
+            return;
+        }
+
+        const statusLabel = {
+            PENDING: 'Chờ xác nhận',
+            CONFIRMED: 'Đã xác nhận',
+            SHIPPED: 'Đang giao',
+            DELIVERED: 'Đã giao',
+            CANCELLED: 'Đã hủy'
+        };
+
+        orderHistory.innerHTML = orders.map(order => `
+            <div class="order-history-item">
+                <div class="order-history-header">
+                    <div>
+                        <strong>Đơn hàng #${order.id}</strong>
+                        <span class="order-date">${new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
+                    </div>
+                    <span class="order-status ${order.status}">
+                        ${statusLabel[order.status] || order.status}
+                    </span>
+                </div>
+                <div class="order-history-body">
+                    <p>Tổng tiền: <strong>${formatPrice(order.totalAmount || 0)}</strong></p>
+                </div>
+            </div>
+        `).join('');
+    })
+    .catch(() => {
+        orderHistory.innerHTML = `
+            <div class="empty-data-msg">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Không thể tải đơn hàng. Vui lòng thử lại.</p>
+            </div>`;
+    });
+}
+
+
+// ==================== PRODUCTS ====================
+function loadProductsFromDb() {
+    fetch('/api/products/all')
+        .then(res => res.json())
+        .then(products => {
+            productsFromDb = products || [];
+            renderHomeFeaturedProducts(productsFromDb);
+            renderProductPage(productsFromDb);
+        })
+        .catch(err => console.error('Error loading products:', err));
+}
+
+// Tìm hàm renderHomeFeaturedProducts và thay toàn bộ bằng:
+function renderHomeFeaturedProducts(products, resetOffset = true) {
+    const grid = document.getElementById('home-product-grid');
+    if (!grid) return;
+
+    if (resetOffset) featuredOffset = 0;
+
+    const slice = resetOffset
+        ? products.slice(0, FEATURED_PER_PAGE)
+        : products;
+
+    if (slice.length === 0) {
+        grid.innerHTML = '<div class="empty-msg">Chưa có sản phẩm nổi bật</div>';
+        return;
+    }
+
+    grid.innerHTML = slice.map(product => `
+        <div class="product-card ${!product.available ? 'out-of-stock' : ''}">
+            <div class="product-image-wrapper">
+                <img src="${product.imageUrl}" alt="${product.name}">
+                ${!product.available ? '<div class="out-of-stock-overlay">Hết hàng</div>' : ''}
+            </div>
+            <h3>${product.name}</h3>
+            <p>${product.origin}</p>
+            <div class="price-row">
+                <div class="price">${formatPrice(product.price)}</div>
+                <div class="price-old">${formatPrice(product.price * 1.15)}</div>
+                <div class="discount-badge ${!product.available ? 'badge-out' : ''}">
+                    ${product.available ? 'Còn hàng' : 'Hết hàng'}
+                </div>
+            </div>
+            <button class="btn-add-cart"
+                ${!product.available ? 'disabled' : ''}
+                onclick="${product.available ? `showQuickBuyFromProduct(${product.id})` : ''}">
+                ${product.available ? 'Mua nhanh' : 'Hết hàng'}
+            </button>
+        </div>
+    `).join('');
+
+    updateFeaturedNav();
+}
+
+function renderProductPage(products) {
+    const container = document.getElementById('product-list-container');
+    if (!container) return;
+
+    if (!products || products.length === 0) {
+        container.innerHTML = '<div class="empty-msg">Chưa có sản phẩm</div>';
+        return;
+    }
+
+    container.innerHTML = products.map(product => `
+        <div class="product-card ${!product.available ? 'out-of-stock' : ''}">
+            <div class="product-image-wrapper">
+                <img src="${product.imageUrl}" alt="${product.name}">
+                ${!product.available ? '<div class="out-of-stock-overlay">Hết hàng</div>' : ''}
+            </div>
+            <h3>${product.name}</h3>
+            <p>${product.origin}</p>
+            <div class="price-row">
+                <div class="price">${formatPrice(product.price)}</div>
+                <div class="price-old">${formatPrice(product.price * 1.1)}</div>
+                <div class="discount-badge ${!product.available ? 'badge-out' : ''}">
+                    ${product.available ? 'Còn hàng' : 'Hết hàng'}
+                </div>
+            </div>
+            <button class="btn-add-cart"
+                ${!product.available ? 'disabled' : ''}
+                onclick="${product.available ? `showQuickBuyFromProduct(${product.id})` : ''}">
+                ${product.available ? 'Mua nhanh' : 'Hết hàng'}
+            </button>
+        </div>
+    `).join('');
+}
+
+function filterProducts() {
+    const selectedRegions = Array.from(
+        document.querySelectorAll('input[name="region"]:checked')
+    ).map(i => i.value);
+    const selectedCategories = Array.from(
+        document.querySelectorAll('input[name="category"]:checked')
+    ).map(i => i.value);
+
+    let filtered = [...productsFromDb];
+    if (selectedRegions.length) {
+        filtered = filtered.filter(p => selectedRegions.includes(p.origin));
+    }
+    if (selectedCategories.length) {
+        filtered = filtered.filter(p => selectedCategories.includes(p.category?.name));
+    }
+    renderProductPage(filtered);
+}
+
+function resetFilters() {
+    document.querySelectorAll('input[name="region"]').forEach(i => i.checked = false);
+    document.querySelectorAll('input[name="category"]').forEach(i => i.checked = false);
+    const searchInput = document.getElementById('home-search-input');
+    if (searchInput) searchInput.value = '';
+    renderProductPage(productsFromDb);
+}
+
+function searchProducts(term) {
+    const query = term.trim().toLowerCase();
+    if (!query) {
+        renderProductPage(productsFromDb);
+        return;
+    }
+    const filtered = productsFromDb.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        (p.category?.name || '').toLowerCase().includes(query) ||
+        (p.origin || '').toLowerCase().includes(query)
+    );
+    renderProductPage(filtered);
+}
+
+
+// ==================== QUICK BUY ====================
+function showQuickBuyFromProduct(productId) {
+    const product = productsFromDb.find(p => p.id === productId);
+    if (!product) return;
+
+    quickBuyProductId = productId;
+    document.getElementById('quickbuy-image').src = product.imageUrl;
+    document.getElementById('quickbuy-image').alt = product.name;
+    document.getElementById('quickbuy-name').textContent = product.name;
+    document.getElementById('quickbuy-tagline').textContent = product.category?.name || 'Sản phẩm tươi ngon';
+    document.getElementById('quickbuy-price').textContent = formatPrice(product.price);
+    document.getElementById('quickbuy-old-price').textContent = formatPrice(product.price * 1.1);
+    document.getElementById('quickbuy-discount').textContent = product.available ? 'Còn hàng' : 'Hết hàng';
+    document.getElementById('quickbuy-description').textContent = product.description;
+    document.getElementById('quickbuy-origin').textContent = '📍 ' + product.origin;
+    document.getElementById('quickbuy-weight').textContent = '📦 ' + (product.quantity || 0) + ' trong kho';
+    document.getElementById('quickbuy-category').textContent = '🏷 ' + (product.category?.name || 'Khác');
+    document.getElementById('quickbuy-quantity').value = '1';
+
+    document.getElementById('quickbuy-modal').classList.add('active');
+}
+
+function closeQuickBuy() {
+    document.getElementById('quickbuy-modal')?.classList.remove('active');
+}
+
+function changeQuickBuyQuantity(change) {
+    const input = document.getElementById('quickbuy-quantity');
+    let value = parseInt(input.value) || 1;
+    value = Math.max(1, value + change);
+    input.value = value;
+}
+
+function quickBuyAddToCart() {
+    if (!quickBuyProductId) return;
+    const product = productsFromDb.find(p => p.id === quickBuyProductId);
+    const quantity = parseInt(document.getElementById('quickbuy-quantity').value) || 1;
+    if (product) {
+        addToCart(product.name, product.price, quantity);
+    }
+    closeQuickBuy();
+}
+
+
+// ==================== CART ====================
+function addToCart(name, price, quantity = 1) {
+    if (!currentUser) {
+        alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
+        navigateTo('login');
+        return;
+    }
+
+    const existing = cart.find(item => item.name === name);
+    if (existing) {
+        existing.quantity += quantity;
+    } else {
+        cart.push({ name, price, quantity });
+    }
+
+    updateCartBadge();
+    saveCart();
+    alert(`Đã thêm "${name}" vào giỏ hàng!`);
+}
+
+function updateCartBadge() {
+    const badge = document.getElementById('cart-badge');
+    if (badge) badge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+}
+
+function saveCart() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function loadCart() {
+    const saved = localStorage.getItem('cart');
+    if (saved) {
+        cart = JSON.parse(saved);
+        updateCartBadge();
+    }
+}
+
+function renderCart() {
+    const cartItems = document.getElementById('cart-items');
+    if (!cartItems) return;
+
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<tr><td colspan="5" class="empty-cart">Giỏ hàng trống</td></tr>';
+        document.getElementById('subtotal').textContent = '0đ';
+        document.getElementById('total').textContent = '0đ';
+        return;
+    }
+
+    let subtotal = 0;
+    cartItems.innerHTML = cart.map((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        return `
+            <tr>
+                <td>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span>${item.name}</span>
+                    </div>
+                </td>
+                <td>${formatPrice(item.price)}</td>
+                <td>
+                    <div class="quantity-control">
+                        <button onclick="updateQuantity(${index}, -1)">-</button>
+                        <input type="number" value="${item.quantity}" min="1"
+                            onchange="setQuantity(${index}, this.value)">
+                        <button onclick="updateQuantity(${index}, 1)">+</button>
+                    </div>
+                </td>
+                <td>${formatPrice(itemTotal)}</td>
+                <td>
+                    <button class="btn-delete" onclick="removeFromCart(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    document.getElementById('subtotal').textContent = formatPrice(subtotal);
+    document.getElementById('total').textContent = formatPrice(subtotal);
+}
+
+function updateQuantity(index, change) {
+    cart[index].quantity = Math.max(1, cart[index].quantity + change);
+    updateCartBadge();
+    saveCart();
+    renderCart();
+}
+
+function setQuantity(index, value) {
+    const qty = parseInt(value);
+    if (qty > 0) {
+        cart[index].quantity = qty;
+        updateCartBadge();
+        saveCart();
+        renderCart();
+    }
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartBadge();
+    saveCart();
+    renderCart();
+}
+
+
+// ==================== CHECKOUT ====================
+function renderCheckout() {
+    const checkoutItems = document.getElementById('checkout-items');
+    if (!checkoutItems) return;
+
+    if (cart.length === 0) {
+        checkoutItems.innerHTML = '<p class="empty-cart">Không có sản phẩm</p>';
+        document.getElementById('checkout-subtotal').textContent = '0đ';
+        document.getElementById('checkout-total').textContent = '0đ';
+        return;
+    }
+
+    let subtotal = 0;
+    checkoutItems.innerHTML = cart.map(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        return `
+            <div class="order-item">
+                <span>${item.name} x ${item.quantity}</span>
+                <span>${formatPrice(itemTotal)}</span>
+            </div>
+        `;
+    }).join('');
+
+    document.getElementById('checkout-subtotal').textContent = formatPrice(subtotal);
+    document.getElementById('checkout-total').textContent = formatPrice(subtotal);
+}
+
+function placeOrder() {
+    if (cart.length === 0) {
+        alert('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi đặt hàng.');
+        return;
+    }
+    if (!currentUser) {
+        alert('Vui lòng đăng nhập để đặt hàng');
+        navigateTo('login');
+        return;
+    }
+
+    const fullname = document.getElementById('fullname').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+
+    if (!fullname || !phone || !address) {
+        alert('Vui lòng điền đầy đủ thông tin giao hàng.');
+        return;
+    }
+
+    const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+    const order = {
+        customerName: fullname,
+        phone,
+        address,
+        notes: document.getElementById('notes').value,
+        paymentMethod,
+        items: cart,
+        total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        status: 'PENDING',
+        createdAt: new Date().toISOString()
+    };
+
+    fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + authToken
+        },
+        body: JSON.stringify(order)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Đặt hàng thất bại');
+        return res.json();
+    })
+    .then(data => {
+        cart = [];
+        updateCartBadge();
+        saveCart();
+        document.getElementById('order-form').reset();
+        showOrderConfirmation(data);
+    })
+    .catch(() => alert('Có lỗi xảy ra. Vui lòng thử lại.'));
+}
+
+function showOrderConfirmation(data) {
+    document.getElementById('confirm-order-id').textContent = '#' + data.id;
+    document.getElementById('confirm-total').textContent = formatPrice(data.totalAmount || data.total || 0);
+    document.getElementById('confirm-payment').textContent = data.paymentMethod || 'COD';
+    document.getElementById('confirm-name').textContent = data.customerName || '';
+    document.getElementById('confirm-phone').textContent = data.phone || '';
+    document.getElementById('confirm-address').textContent = data.address || '';
+    navigateTo('order-confirmation');
+}
+
+
+// ==================== POPUP ====================
+function showPopup() {
+    document.getElementById('popup-notification')?.classList.add('show');
+    setTimeout(closePopup, 5000);
+}
+
+function closePopup() {
+    document.getElementById('popup-notification')?.classList.remove('show');
+}
+
+
+// ==================== UTILS ====================
+function formatPrice(price) {
+    return new Intl.NumberFormat('vi-VN').format(price) + 'đ';
+}
+
+function handleBuyNow() {
+    if (!currentUser) {
+        alert('Vui lòng đăng nhập để mua sản phẩm');
+        navigateTo('login');
+        return;
+    }
+    navigateTo('products');
+}
+// ==================== FEATURED SLIDER ====================
+function slideFeatured(direction) {
+    const total = productsFromDb.length;
+    if (total <= FEATURED_PER_PAGE) return;
+
+    featuredOffset += direction * FEATURED_PER_PAGE;
+
+    if (featuredOffset >= total) featuredOffset = 0;
+    if (featuredOffset < 0) {
+        featuredOffset = Math.floor((total - 1) / FEATURED_PER_PAGE) * FEATURED_PER_PAGE;
+    }
+
+    const slice = productsFromDb.slice(featuredOffset, featuredOffset + FEATURED_PER_PAGE);
+    renderHomeFeaturedProducts(slice, false);
+}
+
+function updateFeaturedNav() {
+    const total = productsFromDb.length;
+    const show = total > FEATURED_PER_PAGE;
+    const prevBtn = document.getElementById('featured-prev');
+    const nextBtn = document.getElementById('featured-next');
+    if (prevBtn) prevBtn.style.display = show ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = show ? 'flex' : 'none';
+}
