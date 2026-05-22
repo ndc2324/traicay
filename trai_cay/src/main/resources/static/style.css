@@ -1988,3 +1988,142 @@ body {
     transform: none;
     box-shadow: none;
 }
+
+/* ===== HOME CATEGORY SECTIONS ===== */
+.home-category-section {
+    padding: 40px 0;
+    border-top: 1px solid #eef5ea;
+}
+
+.category-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.category-header h2 {
+    font-size: 28px;
+    color: #43802F;
+}
+
+
+/* ===== HOME INTRO SECTION ===== */
+.home-intro-section {
+    padding: 60px 0 40px;
+    border-top: 1px solid #eef5ea;
+}
+
+.home-intro-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.home-intro-header h2 {
+    font-size: 32px;
+    color: #43802F;
+    margin-bottom: 10px;
+}
+
+.home-intro-sub {
+    color: #7a8f75;
+    font-size: 16px;
+}
+
+.home-intro-grid {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.home-intro-text {
+    flex: 1;
+}
+
+.home-intro-text p {
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 16px;
+    font-size: 15px;
+}
+
+.btn-intro-more {
+    display: inline-block;
+    background: #4A7C2C;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s;
+    margin-top: 8px;
+}
+
+.btn-intro-more:hover {
+    background: #367018;
+}
+
+.home-intro-stats {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stat-card {
+    background: #f4fbf1;
+    border: 1px solid rgba(74,124,44,0.15);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+
+.stat-card i {
+    font-size: 28px;
+    color: #4A7C2C;
+}
+
+.stat-number {
+    font-size: 26px;
+    font-weight: 700;
+    color: #2f5c15;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #7a8f75;
+}
+
+.home-awards {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    padding: 30px;
+    background: linear-gradient(135deg, #f4fbf1 0%, #e8f5e2 100%);
+    border-radius: 20px;
+}
+
+.award-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #3f7b1f;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.award-item i {
+    font-size: 22px;
+    color: #4A7C2C;
+}

@@ -36,11 +36,7 @@ Open browser: **http://localhost:8080**
 - **Username**: `admin`
 - **Password**: `admin123`
 
-### Customer Account
-- **Username**: `customer1`
-- **Password**: `customer123`
 
----
 
 ## 📡 Quick API Test
 

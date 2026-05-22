@@ -2,7 +2,7 @@
 
 Một ứng dụng web bán trái cây với frontend HTML/CSS/JavaScript thuần và backend Java/Spring Boot với MySQL.
 
-## 🚀 Công nghệ sử dụng
+##  Công nghệ sử dụng
 
 ### Frontend
 - HTML5
@@ -19,26 +19,26 @@ Một ứng dụng web bán trái cây với frontend HTML/CSS/JavaScript thuầ
 - MySQL
 - Lombok
 
-## 📋 Tính năng
+##  Tính năng
 
 ### Khách (Guest)
-- ✅ Xem sản phẩm, tin tức
-- ✅ Thêm vào giỏ hàng
-- ❌ Đặt hàng (Yêu cầu đăng nhập)
+-  Xem sản phẩm, tin tức
+-  Thêm vào giỏ hàng
+-  Đặt hàng (Yêu cầu đăng nhập)
 
 ### Người mua (Customer)
-- ✅ Xem sản phẩm, tin tức
-- ✅ Thêm vào giỏ hàng
-- ✅ Đặt hàng / Thanh toán
-- ✅ Quản lý thông tin cá nhân
+- Xem sản phẩm, tin tức
+- Thêm vào giỏ hàng
+-  Đặt hàng / Thanh toán
+-  Quản lý thông tin cá nhân
 
 ### Quản trị viên (Admin)
-- ✅ Xem sản phẩm, tin tức
-- ✅ Thêm vào giỏ hàng
-- ✅ Đặt hàng / Thanh toán
-- ✅ Quản lý thông tin cá nhân
-- ✅ Thêm/Sửa/Xóa sản phẩm
-- ✅ Quản lý đơn hàng/User
+-  Xem sản phẩm, tin tức
+-  Thêm vào giỏ hàng
+-  Đặt hàng / Thanh toán
+- Quản lý thông tin cá nhân
+- Thêm/Sửa/Xóa sản phẩm
+- Quản lý đơn hàng/User
 
 ## 🛠️ Cài đặt
 
@@ -131,7 +131,7 @@ Mở file `src/main/resources/application.properties` và cập nhật thông ti
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/trai_cay?useSSL=false&serverTimezone=UTC
 spring.datasource.username=root
-spring.datasource.password=your_mysql_password
+spring.datasource.password=Chien2324@
 ```
 
 ### Bước 3: Chạy ứng dụng
@@ -171,16 +171,7 @@ Hoặc chạy trực tiếp từ IntelliJ IDEA:
 - `PUT /api/orders/{id}/status?status={status}` - Cập nhật trạng thái đơn hàng (Admin)
 - `DELETE /api/orders/{id}` - Xóa đơn hàng (Admin)
 
-### News API
-
-- `GET /api/news` - Lấy danh sách tất cả tin tức
-- `GET /api/news/{id}` - Lấy chi tiết tin tức theo ID
-- `GET /api/news/category/{category}` - Lấy tin tức theo danh mục
-- `POST /api/news` - Thêm tin tức mới (Admin)
-- `PUT /api/news/{id}` - Cập nhật tin tức (Admin)
-- `DELETE /api/news/{id}` - Xóa tin tức (Admin)
-
-## 🧪 Test với Postman
+##  Test với Postman
 
 ### 1. Lấy danh sách sản phẩm
 
@@ -215,9 +206,6 @@ Content-Type: application/json
 }
 ```
 
-### 3. Lấy danh sách tin tức
-
-```
 GET http://localhost:8080/api/news
 ```
 
@@ -239,7 +227,7 @@ Content-Type: application/json
 }
 ```
 
-## 🎨 Frontend Features
+##  Frontend Features
 
 ### Các trang chính
 - **Trang chủ**: Hero section, sản phẩm nổi bật
@@ -256,13 +244,13 @@ Content-Type: application/json
 - **FAB**: Nút chat tròn ở góc dưới bên phải
 - **Popup Notification**: Thông báo mua hàng tự động (slide in sau 3s, biến mất sau 5s)
 
-## 👤 Tài khoản mặc định
+##  Tài khoản mặc định
 
 ### Admin
 - Username: `admin`
-- Password: `admin123`
+- Password: `123`
 
-## 📁 Cấu trúc dự án
+## Cấu trúc dự án
 
 ```
 trai_cay/
@@ -284,20 +272,20 @@ trai_cay/
 └── pom.xml
 ```
 
-## 🔐 Bảo mật
+## Bảo mật
 
 - Spring Security được cấu hình để cho phép CORS
 - Tất cả API endpoints hiện tại đều public (có thể thêm authentication sau)
 - Password được mã hóa bằng BCrypt
 
-## 📝 Ghi chú
+##  Ghi chú
 
 - Ứng dụng sử dụng JPA `ddl-auto=none` vì database đã được tạo sẵn
 - Dữ liệu mẫu được tự động insert khi chạy ứng dụng lần đầu
 - Frontend sử dụng localStorage để lưu giỏ hàng
 - Popup notification hiển thị sau 3 giây và tự động tắt sau 5 giây
 
-## 🐛 Khắc phục sự cố
+## Khắc phục sự cố
 
 ### MySQL connection refused
 - Kiểm tra MySQL service đang chạy
@@ -311,8 +299,8 @@ trai_cay/
 - Kiểm tra CORS configuration trong SecurityConfig
 - Xác nhận backend đang chạy đúng port
 
-## 📞 Liên hệ
+##  Liên hệ
 
-- Email: info@freshfruit.vn
-- Phone: 0909 123 456
-- Address: 123 Nguyễn Văn Linh, TP.HCM
+- Email: nhom16@freshfruit.vn
+- Phone: 0123456789
+- Address: nhóm 16 KMA

@@ -158,26 +158,36 @@ function loadAdminDashboard() {
         fetch('/api/orders').then(r => r.json())
     ])
     .then(([products, orders]) => {
-        adminProducts = products;
-        adminOrders = orders;
+        // KIỂM TRA AN TOÀN: Đề phòng API trả về dạng object chứa mảng (vd: { data: [...] })
+        adminProducts = Array.isArray(products) ? products : (products.data || products.content || []);
+        adminOrders = Array.isArray(orders) ? orders : (orders.data || orders.content || []);
 
-        document.getElementById('stat-products').textContent = products.length;
-        document.getElementById('stat-orders').textContent = orders.length;
+        // HIỂN THỊ LÊN GIAO DIỆN TỪ BIẾN adminProducts (đã lưu data)
+        document.getElementById('stat-products').textContent = adminProducts.length;
+        document.getElementById('stat-orders').textContent = adminOrders.length;
 
-        const revenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+        // Tính toán doanh thu từ adminOrders
+        const revenue = adminOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
         document.getElementById('stat-revenue').textContent = revenue.toLocaleString('vi-VN') + 'đ';
 
-        const uniqueCustomers = new Set(orders.map(order => order.customerName || order.phone || order.email)).size;
+        // Tính số khách hàng độc nhất
+        const uniqueCustomers = new Set(adminOrders.map(order => order.customerName || order.phone || order.email)).size;
         document.getElementById('stat-customers').textContent = uniqueCustomers;
 
-        const confirmedCount = orders.filter(order => order.status === 'CONFIRMED' || order.status === 'DELIVERED').length;
-        const conversion = orders.length ? Math.round((confirmedCount / orders.length) * 100) : 0;
+        // Tính tỷ lệ chuyển đổi
+        const confirmedCount = adminOrders.filter(order => order.status === 'CONFIRMED' || order.status === 'DELIVERED').length;
+        const conversion = adminOrders.length ? Math.round((confirmedCount / adminOrders.length) * 100) : 0;
         document.getElementById('stat-conversion').textContent = conversion + '%';
 
-        const pendingCount = orders.filter(order => order.status === 'PENDING').length;
+        // Đơn đang xử lý
+        const pendingCount = adminOrders.filter(order => order.status === 'PENDING').length;
         document.getElementById('stat-pending-orders').textContent = pendingCount;
     })
-    .catch(error => console.error('Error loading dashboard:', error));
+    .catch(error => {
+        console.error('Error loading dashboard:', error);
+        // Nếu lỗi API, hiển thị tạm độ dài của mảng adminProducts hiện tại (nếu có)
+        document.getElementById('stat-products').textContent = adminProducts.length || 0;
+    });
 }
 
 function loadAdminProducts() {

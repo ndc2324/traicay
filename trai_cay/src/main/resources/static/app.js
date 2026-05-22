@@ -409,9 +409,19 @@ function loadProductsFromDb() {
             productsFromDb = products || [];
             renderHomeFeaturedProducts(productsFromDb);
             renderProductPage(productsFromDb);
+            renderCategoryGrid('vn');
+            renderCategoryGrid('foreign');
         })
         .catch(err => console.error('Error loading products:', err));
+    /*fetch('/api/categories')
+            .then(res => res.json())
+            .then(categories => {
+                renderCategoryDropdown(categories || []);
+            })
+            .catch(err => console.error('Error loading categories:', err));*/
+
 }
+
 
 // Tìm hàm renderHomeFeaturedProducts và thay toàn bộ bằng:
 function renderHomeFeaturedProducts(products, resetOffset = true) {
@@ -821,4 +831,138 @@ function updateFeaturedNav() {
     const nextBtn = document.getElementById('featured-next');
     if (prevBtn) prevBtn.style.display = show ? 'flex' : 'none';
     if (nextBtn) nextBtn.style.display = show ? 'flex' : 'none';
+}
+// ==================== CATEGORY DROPDOWN ====================
+function renderCategoryDropdown(categories) {
+    const dropdown = document.getElementById('category-dropdown');
+    if (!dropdown) return;
+
+    // Giữ lại item "Tất cả" ở đầu
+    const allItem = dropdown.querySelector('li:first-child');
+    dropdown.innerHTML = '';
+    if (allItem) dropdown.appendChild(allItem);
+
+    categories.forEach(cat => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <a href="#" onclick="filterByCategory('${cat.name}')">
+                <i class="fas fa-tag"></i> ${cat.name}
+            </a>
+        `;
+        dropdown.appendChild(li);
+    });
+}
+
+function filterByCategory(categoryName) {
+    // Chuyển sang trang sản phẩm
+    navigateTo('products');
+
+    // Bỏ chọn tất cả filter cũ
+    document.querySelectorAll('input[name="region"]').forEach(i => i.checked = false);
+    document.querySelectorAll('input[name="category"]').forEach(i => i.checked = false);
+
+    if (!categoryName) {
+        // Hiển thị tất cả
+        renderProductPage(productsFromDb);
+        return;
+    }
+
+    // Tick checkbox danh mục tương ứng nếu có
+    const checkbox = document.querySelector(
+        `input[name="category"][value="${categoryName}"]`
+    );
+    if (checkbox) {
+        checkbox.checked = true;
+    }
+
+    // Lọc sản phẩm theo danh mục
+    const filtered = productsFromDb.filter(p =>
+        (p.category?.name || '') === categoryName
+    );
+    renderProductPage(filtered);
+}
+
+// ===== CATEGORY SLIDER (Việt Nam / Nước ngoài) =====
+const categoryOffsets = { vn: 0, foreign: 0 };
+const CATEGORY_PER_PAGE = 3;
+
+const VN_ORIGINS = ['việt nam', 'hà nội', 'hồ chí minh', 'đà lạt',
+                    'tiền giang', 'bến tre', 'long an', 'vĩnh long',
+                    'sóc trăng', 'bình phước', 'đồng nai'];
+
+function isVietnamese(origin) {
+    return VN_ORIGINS.some(o => (origin || '').toLowerCase().includes(o));
+}
+
+function renderCategoryGrid(type) {
+    const gridId  = type === 'vn' ? 'vn-product-grid' : 'foreign-product-grid';
+    const grid    = document.getElementById(gridId);
+    if (!grid || productsFromDb.length === 0) return;
+
+    const filtered = productsFromDb.filter(p =>
+        type === 'vn' ? isVietnamese(p.origin) : !isVietnamese(p.origin)
+    );
+
+    const offset = categoryOffsets[type];
+    const slice  = filtered.slice(offset, offset + CATEGORY_PER_PAGE);
+
+    if (slice.length === 0) {
+        grid.innerHTML = '<div class="empty-msg">Không có sản phẩm</div>';
+        return;
+    }
+
+    grid.innerHTML = slice.map(product => `
+        <div class="product-card ${!product.available ? 'out-of-stock' : ''}">
+            <div class="product-image-wrapper">
+                <img src="${product.imageUrl}" alt="${product.name}"
+                     onerror="this.src='assets/images/default-product.png'">
+                ${!product.available ? '<div class="out-of-stock-overlay">Hết hàng</div>' : ''}
+            </div>
+            <h3>${product.name}</h3>
+            <p>${product.origin}</p>
+            <div class="price-row">
+                <div class="price">${formatPrice(product.price)}</div>
+                <div class="price-old">${formatPrice(product.price * 1.1)}</div>
+                <div class="discount-badge ${!product.available ? 'badge-out' : ''}">
+                    ${product.available ? 'Còn hàng' : 'Hết hàng'}
+                </div>
+            </div>
+            <button class="btn-add-cart"
+                ${!product.available ? 'disabled' : ''}
+                onclick="${product.available ? `showQuickBuyFromProduct(${product.id})` : ''}">
+                ${product.available ? 'Mua nhanh' : 'Hết hàng'}
+            </button>
+        </div>
+    `).join('');
+}
+
+function slideCategory(type, direction) {
+    const filtered = productsFromDb.filter(p =>
+        type === 'vn' ? isVietnamese(p.origin) : !isVietnamese(p.origin)
+    );
+    const total = filtered.length;
+    if (total <= CATEGORY_PER_PAGE) return;
+
+    categoryOffsets[type] += direction * CATEGORY_PER_PAGE;
+    if (categoryOffsets[type] >= total) categoryOffsets[type] = 0;
+    if (categoryOffsets[type] < 0)
+        categoryOffsets[type] = Math.floor((total - 1) / CATEGORY_PER_PAGE) * CATEGORY_PER_PAGE;
+
+    renderCategoryGrid(type);
+}
+
+function filterByCategory(type) {
+    // Reset filter checkboxes
+    document.querySelectorAll('input[name="region"]').forEach(i => i.checked = false);
+    document.querySelectorAll('input[name="category"]').forEach(i => i.checked = false);
+
+    if (type === 'vn') {
+        const vnCheckbox = document.querySelector('input[name="region"][value="Việt Nam"]');
+        if (vnCheckbox) vnCheckbox.checked = true;
+    } else if (type === 'foreign') {
+        const foreignCheckbox = document.querySelector('input[name="region"][value="Trái cây nhập khẩu"]');
+        if (foreignCheckbox) foreignCheckbox.checked = true;
+    }
+
+    filterProducts();
 }

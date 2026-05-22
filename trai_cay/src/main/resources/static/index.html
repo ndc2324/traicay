@@ -114,8 +114,97 @@
         </div>
     </div>
 
-        </section>
+        <!-- ===== TRÁI CÂY VIỆT NAM ===== -->
+        <div class="home-category-section">
+            <div class="category-header">
+                <h2>Trái Cây Việt Nam</h2>
+            </div>
+            <div class="featured-slider-outer">
+                <button class="featured-nav-btn" onclick="slideCategory('vn', -1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="featured-slider-wrapper">
+                    <div class="product-grid" id="vn-product-grid"></div>
+                </div>
+                <button class="featured-nav-btn" onclick="slideCategory('vn', 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
 
+        <!-- ===== TRÁI CÂY NƯỚC NGOÀI ===== -->
+        <div class="home-category-section">
+            <div class="category-header">
+                <h2>Trái Cây Nhập Khẩu</h2>
+            </div>
+            <div class="featured-slider-outer">
+                <button class="featured-nav-btn" onclick="slideCategory('foreign', -1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="featured-slider-wrapper">
+                    <div class="product-grid" id="foreign-product-grid"></div>
+                </div>
+                <button class="featured-nav-btn" onclick="slideCategory('foreign', 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== GIỚI THIỆU FRESH FRUIT ===== -->
+        <div class="home-intro-section">
+            <div class="home-intro-header">
+                <h2>Về Fresh Fruit</h2>
+                <p class="home-intro-sub">Cam kết mang đến trái cây tươi ngon nhất mỗi ngày</p>
+            </div>
+            <div class="home-intro-grid">
+                <div class="home-intro-text">
+                    <p>Fresh Fruit được thành lập với niềm đam mê mang đến những loại trái cây tươi ngon nhất cho người Việt. Với hơn 10 năm kinh nghiệm, chúng tôi tự hào phục vụ hàng nghìn khách hàng mỗi ngày.</p>
+                    <p>Tất cả sản phẩm đều đạt chứng nhận <strong>GlobalGAP</strong>, được kiểm soát chất lượng nghiêm ngặt từ nhà vườn đến tay người tiêu dùng.</p>
+                    <a href="#" onclick="navigateTo('about')" class="btn-intro-more">Tìm hiểu thêm</a>
+                </div>
+                <div class="home-intro-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-store"></i>
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Sản phẩm</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <span class="stat-number">10.000+</span>
+                        <span class="stat-label">Khách hàng</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-globe"></i>
+                        <span class="stat-number">20+</span>
+                        <span class="stat-label">Quốc gia</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-award"></i>
+                        <span class="stat-number">10+</span>
+                        <span class="stat-label">Năm kinh nghiệm</span>
+                    </div>
+                </div>
+            </div>
+            <div class="home-awards">
+                <div class="award-item">
+                    <i class="fas fa-certificate"></i>
+                    <span>Chứng nhận GlobalGAP</span>
+                </div>
+                <div class="award-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Vệ sinh an toàn thực phẩm</span>
+                </div>
+                <div class="award-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Giao hàng nhanh 2-4h</span>
+                </div>
+                <div class="award-item">
+                    <i class="fas fa-undo"></i>
+                    <span>Đổi trả trong 24h</span>
+                </div>
+            </div>
+        </div>
+        </section>
         <!-- About Page -->
         <section id="about" class="page-section">
             <div class="about-section">
@@ -228,7 +317,7 @@
                             </label>
                             <br>
                             <label>
-                                <input type="checkbox" name="category" value="Bưởi" onchange="filterProducts()"> Bưởi
+                                <input type="checkbox" name="category" value="Khác" onchange="filterProducts()"> Khác
                             </label>
                         </div>
                         <button class="btn-filter-reset" onclick="resetFilters()">Đặt lại bộ lọc</button>
