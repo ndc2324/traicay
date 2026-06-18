@@ -18,8 +18,8 @@ public class Product {
     
     @Column(nullable = false)
     private String name;
-    
-    @Column(nullable = false)
+
+    @Column(columnDefinition = "TEXT")
     private String description;
     
     @Column(nullable = false)

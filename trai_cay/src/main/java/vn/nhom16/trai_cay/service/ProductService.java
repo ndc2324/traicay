@@ -22,7 +22,6 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    // ✅ Dành cho khách hàng — chỉ trả sản phẩm còn hàng
     public List<Product> getAvailableProducts() {
         return productRepository.findByAvailableTrue();
     }

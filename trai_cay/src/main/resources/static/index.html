@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<div class="container">
+
     <!-- Header -->
 
     <div class="header-wrapper">
@@ -24,20 +24,23 @@
                 </div>
             </div>
             <div class="header-center">
-                <form class="search-bar" action="#" onsubmit="event.preventDefault()">
-                    <i class="fas fa-search outline-icon search-icon"></i>
-                    <input id="home-search-input" type="text" placeholder="Tìm kiếm sản phẩm..." oninput="searchProducts(this.value)">
+                <form class="search-bar" action="#" onsubmit="event.preventDefault(); executeSearch();">
+                    <i class="fas fa-search outline-icon search-icon" style="cursor: pointer;" onclick="executeSearch()"></i>
+
+                    <input id="home-search-input" type="text" placeholder="Tìm kiếm sản phẩm...">
                 </form>
             </div>
             <div class="header-right">
                 <div class="icon-button cart-icon" onclick="navigateTo('cart')">
                     <i class="fas fa-shopping-cart"></i>
+                    <span class="icon-text">Giỏ hàng</span>
                     <span class="badge" id="cart-badge">0</span>
                 </div>
 
                 <div class="icon-button user-icon" id="user-avatar-btn" onclick="handleUserIconClick()">
-                    <i class="fa fa-user" id="user-icon-default"></i>
-                    <img id="user-avatar-img" src="" alt="Avatar" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:16px;">
+                    <i class="far fa-user" id="user-icon-default"></i>
+                    <img id="user-avatar-img" src="" alt="Avatar" style="display:none;">
+                    <span class="icon-text" id="user-text-default">Đăng nhập</span>
                 </div>
             </div>
         </header>
@@ -46,9 +49,24 @@
         <nav class="navigation">
             <ul>
                 <li><a href="#" class="nav-link active" data-page="home">Trang chủ</a></li>
+
                 <li><a href="#" class="nav-link" data-page="about">Giới thiệu</a></li>
-                <li><a href="#" class="nav-link" data-page="products">Sản phẩm</a></li>
+
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link" data-page="products">
+                        Sản phẩm <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 4px;"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" onclick="filterByMenu('Việt Nam')">Trái cây Việt Nam</a></li>
+                        <li><a href="#" onclick="filterByMenu('Trái cây nhập khẩu')">Trái cây nhập khẩu</a></li>
+                        <li><a href="#" onclick="filterByMenu('Táo')">Táo</a></li>
+                        <li><a href="#" onclick="filterByMenu('Quả mọng')">Quả mọng</a></li>
+                        <li><a href="#" onclick="filterByMenu('Khác')">Trái cây theo mùa</a></li>
+                    </ul>
+                </li>
+
                 <li><a href="#" class="nav-link" data-page="news">Mùa vụ/Tin tức</a></li>
+
                 <li><a href="#" class="nav-link" id="profile-link" data-page="profile" style="display: none;">Hồ sơ</a></li>
                 <li id="checkout-nav-item" style="display: none;">
                     <a href="#" class="nav-link" data-page="checkout">Thanh toán</a>
@@ -56,8 +74,8 @@
             </ul>
         </nav>
     </div>
-    
 
+    <div class="container">
     <!-- Main Content -->
     <main class="main-content">
         <!-- Home Page -->
@@ -272,7 +290,6 @@
         <!-- Products Page -->
         <section id="products" class="page-section">
             <div class="featured-products">
-                <h2>Sản Phẩm Nổi Bật</h2>
                 <div class="products-container">
                     <div class="filter-sidebar">
                         <h3>Bộ Lọc</h3>
@@ -322,8 +339,11 @@
                         </div>
                         <button class="btn-filter-reset" onclick="resetFilters()">Đặt lại bộ lọc</button>
                     </div>
+                    <div class="product-main-area" style="width: 100%;">
+                        <h2>Sản Phẩm</h2>
                     <div class="product-grid" id="product-list-container">
                     </div>
+                </div>
                 </div>
             </div>
         </section>
@@ -487,47 +507,85 @@
         </section>
 
         <!-- Product Details Page -->
+        <!-- Product Details Page -->
         <section id="product-detail" class="page-section">
-            <div class="product-detail-section">
-                <h1 id="detail-title">Chi Tiết Sản Phẩm</h1>
-                <div class="product-detail-container">
-                    <div class="product-detail-image">
-                        <img id="detail-image" src="" alt="Product">
-                    </div>
-                    <div class="product-detail-info">
-                        <h2 id="detail-name"></h2>
-                        <div class="detail-meta">
-                            <span id="detail-category" class="badge-category"></span>
-                            <span id="detail-rating" class="rating">⭐ 4.5/5 (120 đánh giá)</span>
-                        </div>
-                        <div class="detail-price">
-                            <span id="detail-price" class="price"></span>
-                            <span id="detail-old-price" class="old-price"></span>
-                        </div>
-                        <div class="detail-description">
-                            <h3>Mô tả</h3>
-                            <p id="detail-desc"></p>
-                        </div>
-                        <div class="detail-info-box">
-                            <div class="info-item">
-                                <label>Xuất xứ:</label>
-                                <span id="detail-origin"></span>
-                            </div>
-                            <div class="info-item">
-                                <label>Tồn kho:</label>
-                                <span id="detail-stock"></span>
-                            </div>
-                        </div>
-                        <div class="detail-actions">
-                            <div class="quantity-control">
-                                <button onclick="changeDetailQuantity(-1)">-</button>
-                                <input type="number" id="detail-quantity" value="1" min="1">
-                                <button onclick="changeDetailQuantity(1)">+</button>
-                            </div>
-                            <button class="btn-primary" onclick="addDetailToCart()">Thêm vào giỏ</button>
-                            <button class="btn-secondary" onclick="buyDetailNow()">Mua ngay</button>
+            <div class="product-detail-wrapper">
+                <!-- Thanh điều hướng Breadcrumb -->
+                <div class="breadcrumb">
+                    <a href="#" onclick="navigateTo('home')">Trang chủ</a> /
+                    <a href="#" onclick="navigateTo('products')">Sản phẩm</a> /
+                    <span id="breadcrumb-product-name">Chi tiết</span>
+                </div>
+
+                <div class="product-detail-main">
+                    <!-- Khối bên trái: Ảnh sản phẩm -->
+                    <div class="product-detail-left">
+                        <div class="main-image-box">
+                            <img id="detail-image" src="" alt="Product">
                         </div>
                     </div>
+
+                    <!-- Khối bên phải: Thông tin đặt hàng -->
+                    <div class="product-detail-right">
+                        <h1 id="detail-name">Tên sản phẩm</h1>
+                        <div class="detail-meta-info">
+                            <span class="detail-rating">⭐⭐⭐⭐⭐ (120 đánh giá)</span>
+                            <span class="detail-sold">Đã bán: 500+</span>
+                        </div>
+
+                        <div class="detail-price-box">
+                            <span id="detail-price" class="current-price">0đ</span>
+                            <span id="detail-old-price" class="old-price">0đ</span>
+                            <span class="discount-percent" id="detail-discount-percent">-10%</span>
+                        </div>
+
+                        <div class="detail-summary">
+                            <ul class="detail-attributes">
+                                <li><strong><i class="fas fa-map-marker-alt"></i> Xuất xứ:</strong> <span id="detail-origin"></span></li>
+                                <li><strong><i class="fas fa-tag"></i> Danh mục:</strong> <span id="detail-category"></span></li>
+                                <li><strong><i class="fas fa-box"></i> Tình trạng:</strong> <span id="detail-stock" class="in-stock-text"></span></li>
+                            </ul>
+                        </div>
+
+                        <div class="detail-actions-box">
+                            <div class="qty-selector">
+                                <p>Số lượng:</p>
+                                <div class="quantity-control">
+                                    <button onclick="changeDetailQuantity(-1)">-</button>
+                                    <input type="number" id="detail-quantity" value="1" min="1">
+                                    <button onclick="changeDetailQuantity(1)">+</button>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button class="btn-add-to-cart" onclick="addDetailToCart()">
+                                    <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                                </button>
+                                <button class="btn-buy-now" onclick="buyDetailNow()">Mua ngay</button>
+                            </div>
+                        </div>
+
+                        <!-- Khung chính sách bán hàng -->
+                        <div class="detail-policies">
+                            <div class="policy-item"><i class="fas fa-truck"></i> Giao hàng siêu tốc 2h</div>
+                            <div class="policy-item"><i class="fas fa-sync"></i> Đổi trả miễn phí trong 24h</div>
+                            <div class="policy-item"><i class="fas fa-shield-alt"></i> 100% Sạch & An Toàn</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Khối Mô tả chi tiết -->
+                <div class="product-description-section">
+                    <h2>Mô tả sản phẩm</h2>
+                    <div class="description-content" id="detail-desc">
+                        <!-- Nội dung mô tả sẽ được JS điền vào đây -->
+                    </div>
+                </div>
+
+                <!-- Khối Sản Phẩm Liên Quan -->
+                <div class="related-products-section">
+                    <h2>Sản Phẩm Cùng Danh Mục</h2>
+                    <div class="product-grid" id="related-product-grid"></div>
                 </div>
             </div>
         </section>
@@ -748,7 +806,88 @@
             </div>
         </section>
 
-    <!-- Footer -->
+
+        <section class="why-us-section">
+            <div class="why-left">
+                <h2>
+                Tại sao bạn lựa chọn chúng tôi
+                </h2>
+
+                <p class="why-desc">
+                    Fresh Fruit cung cấp đa dạng trái cây trong nước và nhập khẩu,
+                    đảm bảo chất lượng, nguồn gốc rõ ràng và mang đến trải nghiệm
+                    tốt nhất cho khách hàng.
+                </p>
+
+                <ul class="why-list">
+                    <li>Tận tâm với khách hàng và người tiêu dùng</li>
+                    <li>Hệ thống cửa hàng trên toàn quốc</li>
+                    <li>Quy trình sản phẩm đạt chuẩn chất lượng</li>
+                    <li>Công nghệ bảo quản hiện đại</li>
+                </ul>
+            </div>
+
+            <div class="why-right">
+                <img
+                        src="https://img1.kienthucvui.vn/uploads/2021/12/23/hinh-anh-trai-cay-cac-loai_094110718.jpg"
+                        alt="Fresh Fruit">
+
+                <div class="testimonial-box">
+
+                    <div class="testimonial-content active">
+                        <p>
+                            Trái cây tại Fresh Fruit luôn tươi ngon,
+                            nguồn gốc rõ ràng và dịch vụ rất tận tâm.
+                        </p>
+
+                        <div class="testimonial-user">
+                            <img src="https://cdn.mosflyvn.com/upload/mosflyvn_com/post/images/2024/04/29/408/meme-huan-hoa-hong-10-diem-2.jpg">
+                            <div>
+                                <h4>Huấn Hoa Hồng</h4>
+                                <span>Khách hàng thân thiết</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-content">
+                        <p>
+                            Tôi rất yên tâm khi mua trái cây tại Fresh Fruit,
+                            sản phẩm chất lượng.
+                        </p>
+
+                        <div class="testimonial-user">
+                            <img src="https://tse2.mm.bing.net/th/id/OIP.qoMRLMUa449l3EjGRKEWTAHaJ4?pid=Api&P=0&h=180">
+                            <div>
+                                <h4>TRường Con</h4>
+                                <span>Nhân viên văn phòng</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-content">
+                        <p>
+                            Gia đình tôi đã sử dụng sản phẩm của Fresh Fruit
+                            nhiều năm và luôn hài lòng.
+                        </p>
+
+                        <div class="testimonial-user">
+                            <img src="https://cdn.tech24.vn/upload/tech24_vn/post/images/2024/06/17/557/kha-banh-meme-3.jpg">
+                            <div>
+                                <h4>Lê Bá Khá</h4>
+                                <span>Khách hàng VIP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="testimonial-dots">
+                        <span class="t-dot active"></span>
+                        <span class="t-dot"></span>
+                        <span class="t-dot"></span>
+                    </div>
+
+                </div>
+            </div>
+        </section>
     <footer class="footer">
         <div class="footer-column">
             <h3>Liên hệ</h3>
@@ -827,6 +966,16 @@
     </main>
 </div>
 <script src="app.js"></script>
+    <div class="promo-popup-overlay" id="promo-popup">
+        <div class="promo-popup-content">
+            <button class="promo-popup-close" onclick="closePromoPopup()">
+                <i class="fas fa-times"></i>
+            </button>
 
+            <a href="#" onclick="closePromoPopup(); navigateTo('products');">
+                <img src="assets/images/quangcao1.png" alt="Siêu Sale Hôm Nay" id="promo-popup-img">
+            </a>
+        </div>
+    </div>
 </body>
 </html>
