@@ -53,7 +53,14 @@
         </header>
 
         <main class="content-area">
+            <!-- ================================================================
+     THAY THẾ <section id="admin-dashboard" class="panel active">
+     trong file admin.html bằng đoạn code dưới đây
+     ================================================================ -->
+
             <section id="admin-dashboard" class="panel active">
+
+                <!-- Stat cards giữ nguyên như cũ -->
                 <div class="dashboard-grid">
                     <div class="stat-card">
                         <h3>Tổng sản phẩm</h3>
@@ -65,18 +72,85 @@
                         <p id="stat-orders" class="stat-number">0</p>
                         <span class="stat-caption">Tổng đơn hiện có</span>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card stat-card-green">
                         <h3>Doanh thu</h3>
                         <p id="stat-revenue" class="stat-number">0đ</p>
-                        <span class="stat-caption">Doanh thu dự kiến</span>
+                        <span class="stat-caption">Tổng doanh thu xác nhận</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Khách hàng mới</h3>
+                        <h3>Khách hàng</h3>
                         <p id="stat-customers" class="stat-number">0</p>
-                        <span class="stat-caption">Khách hàng mới trong tháng</span>
+                        <span class="stat-caption">Khách hàng độc nhất</span>
                     </div>
                 </div>
 
+                <!-- ===== KHU VỰC BIỂU ĐỒ ===== -->
+                <div class="charts-grid">
+
+                    <!-- Biểu đồ doanh thu theo tháng -->
+                    <div class="chart-card chart-card-wide">
+                        <div class="chart-card-header">
+                            <div>
+                                <h4>Doanh thu theo tháng</h4>
+                                <p>Biểu đồ doanh thu 6 tháng gần nhất</p>
+                            </div>
+                            <div class="chart-filters">
+                                <button class="chart-filter-btn active" onclick="setRevenueChartPeriod(6, this)">6 tháng</button>
+                                <button class="chart-filter-btn" onclick="setRevenueChartPeriod(12, this)">12 tháng</button>
+                            </div>
+                        </div>
+                        <canvas id="revenue-chart" height="120"></canvas>
+                    </div>
+
+                    <!-- Biểu đồ trạng thái đơn hàng -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <h4>Trạng thái đơn hàng</h4>
+                                <p>Phân bố theo trạng thái hiện tại</p>
+                            </div>
+                        </div>
+                        <div class="donut-wrapper">
+                            <canvas id="status-chart"></canvas>
+                        </div>
+                        <div id="status-legend" class="chart-legend"></div>
+                    </div>
+
+                </div>
+
+                <!-- Hàng 2: Top sản phẩm + Đơn hàng gần đây -->
+                <div class="charts-grid">
+
+                    <!-- Top sản phẩm bán chạy -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <h4>Top sản phẩm bán chạy</h4>
+                                <p>Dựa trên số lượng đặt hàng</p>
+                            </div>
+                        </div>
+                        <canvas id="top-products-chart" height="200"></canvas>
+                    </div>
+
+                    <!-- Đơn hàng gần đây -->
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <div>
+                                <h4>Đơn hàng gần đây</h4>
+                                <p>5 đơn hàng mới nhất</p>
+                            </div>
+                            <button class="btn-secondary" onclick="showAdminTab('orders', {currentTarget: document.querySelectorAll('.sidebar-link')[2]})">
+                                Xem tất cả
+                            </button>
+                        </div>
+                        <div id="recent-orders-list" class="recent-orders-list">
+                            <p style="color:#aaa; padding:20px; text-align:center;">Đang tải...</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Tổng hợp nhanh giữ nguyên -->
                 <div class="dashboard-panel">
                     <div class="dashboard-summary">
                         <div>
@@ -85,16 +159,25 @@
                         </div>
                         <div class="dashboard-metrics">
                             <div>
-                                <span>Chuyển đổi</span>
+                                <span>Tỷ lệ hoàn thành</span>
                                 <strong id="stat-conversion">0%</strong>
                             </div>
                             <div>
                                 <span>Đơn đang xử lý</span>
                                 <strong id="stat-pending-orders">0</strong>
                             </div>
+                            <div>
+                                <span>Đơn đang giao</span>
+                                <strong id="stat-shipped-orders">0</strong>
+                            </div>
+                            <div>
+                                <span>Đơn đã hủy</span>
+                                <strong id="stat-cancelled-orders">0</strong>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </section>
 
             <section id="admin-products" class="panel">

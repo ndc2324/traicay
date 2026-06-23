@@ -9,6 +9,7 @@ body {
     font-family: 'Roboto', sans-serif;
     background-color: #ffffff;
     color: #333;
+    overflow-x: hidden;
 }
 
 .container {
@@ -109,16 +110,18 @@ body {
 }
 
 .icon-button {
-position: relative;
+    position: relative;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
     height: 46px;
-    padding: 0 16px; /* Thay width cố định bằng padding để nút tự động co giãn theo chữ */
-    gap: 10px; /* Khoảng cách giữa icon và chữ */
-    border-radius: 12px;
-    background: rgba(255,255,255,0.14); /* Nền trắng mờ giống ảnh 1 */
-    border: 1px solid rgba(255,255,255,0.2);
+    padding: 0 10px;
+    gap: 8px;
+
+    background: transparent;
+    border: none;
+
     cursor: pointer;
     color: white;
     font-size: 15px;
@@ -127,7 +130,8 @@ position: relative;
 }
 
 .icon-button:hover {
-  background: rgba(255,255,255,0.25);
+  background: transparent;
+  opacity: 0.8;
 }
 .icon-text {
     white-space: nowrap; /* Đảm bảo chữ không bị rớt dòng */
@@ -145,15 +149,18 @@ position: relative;
     justify-content: center;
 }
 .icon-button.user-icon {
-    padding: 0 16px !important;
-        overflow: visible !important;
+   padding: 0 10px !important;
+       overflow: visible !important;
 }
 .icon-button.user-icon img {
-    width: 26px !important; /* Thu nhỏ ảnh đại diện lại */
-        height: 26px !important;
+    width: 38px !important;
+        height: 38px !important;
         object-fit: cover;
-        border-radius: 50% !important; /* Bo tròn ảnh đại diện */
+        border-radius: 50% !important;
+        border: 2px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         display: block;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .badge {
    position: absolute;
@@ -328,23 +335,30 @@ position: relative;
 /* Hero Section */
 /* ==================== BANNER SLIDER ==================== */
 .banner-slider {
-    width: 100%;
-    max-width: 1200px;
-    margin: 20px auto 40px auto;
+   width: 100vw;
+       max-width: 100vw;
+       position: relative;
+       left: 50%;
+       transform: translateX(-50%);
+       margin: 0 0 40px 0;
 }
     
 .slider-container {
     position: relative;
-    height: 450px;
-    overflow: hidden;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1200 / 500;
+        overflow: hidden;
+        border-radius: 0;
+        box-shadow: none;
 }
 
 .slides-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
 }
 
 .slide {
@@ -362,9 +376,9 @@ position: relative;
 
 .slide img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+        height: 100%;
+        object-fit: cover;
+        display: block;
 }
 
 /* Nút Prev / Next */
@@ -1463,26 +1477,40 @@ position: relative;
 
 /* Auth Section */
 .auth-section {
-    padding: 50px 0;
+    padding: 60px 20px;
+    background-color: #f4fbf1; /* Thêm nền xanh lá cực nhẹ để khối form trắng nổi bật lên */
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .auth-container {
-    max-width: 500px;
+    width: 100%;
+    max-width: 420px; /* Thu hẹp từ 500px xuống 420px cho form gọn gàng và chuẩn tỷ lệ */
     margin: 0 auto;
 }
 
 .auth-form {
     background-color: white;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    padding: 40px 35px;
+    border-radius: 20px; /* Bo tròn góc mềm mại hơn */
+    box-shadow: 0 15px 35px rgba(74, 124, 44, 0.08); /* Bóng đổ đổ xuống mượt mà */
 }
 
 .auth-form h2 {
     text-align: center;
     font-size: 28px;
-    color: #4A7C2C;
-    margin-bottom: 30px;
+    color: #2f5c15;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.auth-subtitle {
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 25px;
 }
 
 .auth-form .form-group {
@@ -1492,50 +1520,88 @@ position: relative;
 .auth-form .form-group label {
     display: block;
     margin-bottom: 8px;
-    color: #333;
-    font-weight: 500;
+    color: #444;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Khung chứa input và icon */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 15px;
+    color: #aaa;
+    font-size: 16px;
+    transition: color 0.3s ease;
 }
 
 .auth-form .form-group input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 14px 15px 14px 45px; /* Lùi lề trái 45px để tránh chữ đè lên icon */
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 15px;
     font-family: inherit;
+    background-color: #fafafa;
+    color: #333;
+    transition: all 0.3s ease;
 }
 
+.auth-form .form-group input::placeholder {
+    color: #bbb;
+}
+
+/* Hiệu ứng khi bấm vào ô nhập liệu */
 .auth-form .form-group input:focus {
     outline: none;
     border-color: #4A7C2C;
+    background-color: #fff;
+    box-shadow: 0 0 0 3.5px rgba(74, 124, 44, 0.15); /* Viền sáng Glow */
 }
 
-.auth-form .btn-primary {
+/* Đổi màu icon sang xanh khi đang gõ chữ */
+.input-wrapper:focus-within i {
+    color: #4A7C2C;
+}
+
+/* Nút bấm */
+.auth-btn {
     width: 100%;
     background-color: #4A7C2C;
     color: white;
     border: none;
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(74, 124, 44, 0.2);
 }
 
-.auth-form .btn-primary:hover {
-    background-color: #1B5E20;
+.auth-btn:hover {
+    background-color: #367018;
+    transform: translateY(-2px); /* Hiệu ứng nảy nhẹ khi di chuột */
+    box-shadow: 0 6px 20px rgba(74, 124, 44, 0.3);
 }
 
 .auth-switch {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 25px;
     color: #666;
+    font-size: 14.5px;
 }
 
 .auth-switch a {
     color: #4A7C2C;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .auth-switch a:hover {
@@ -2542,7 +2608,7 @@ position: relative;
     left: -80px;
     bottom: -50px;
 
-    width: 420px;
+    width: 400px;
     min-height: 330px;
     background: #222;
     border-radius: 30px;
@@ -2559,9 +2625,9 @@ position: relative;
 }
 
 .testimonial-content p {
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1.7;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
 }
 
 .testimonial-user {
@@ -2592,16 +2658,606 @@ position: relative;
     display: flex;
     justify-content: center;
     gap: 12px;
-    margin-top: 35px;
+    margin-top: 30px;
 }
 
 .t-dot {
-    width: 12px;
-    height: 12px;
+    width: 8px;
+    height: 8px;
     background: #888;
     border-radius: 50%;
 }
 
 .t-dot.active {
     background: white;
+}
+.cart-icon {
+    padding: 0 8px !important; /* Xóa khoảng trống thừa 2 bên */
+}
+
+.cart-icon i {
+    font-size: 24px; /* Phóng to icon giỏ hàng lên cho cân đối */
+}
+
+/* Căn chỉnh lại vị trí của chấm đỏ báo số lượng */
+.cart-icon .badge {
+    top: -4px;
+    right: -10px;
+}
+#user-icon-default {
+    font-size: 24px;
+}
+/* ==============================================================
+   THÊM VÀO CUỐI file style.css
+   ============================================================== */
+
+/* ===== CHECKOUT STEPS ===== */
+.checkout-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    gap: 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.step-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s;
+}
+
+.step.active .step-icon {
+    background: #4A7C2C;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(74,124,44,0.35);
+}
+
+.step span {
+    font-size: 13px;
+    color: #aaa;
+    font-weight: 500;
+}
+
+.step.active span {
+    color: #4A7C2C;
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background: #e0e0e0;
+    max-width: 80px;
+    margin: 0 8px;
+    margin-bottom: 24px;
+}
+
+/* ===== CHECKOUT LAYOUT ===== */
+.checkout-container {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+.checkout-left {
+    flex: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkout-right {
+    flex: 1;
+    position: sticky;
+    top: 160px;
+}
+
+/* ===== CHECKOUT CARD ===== */
+.checkout-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid #f0f0f0;
+}
+
+.checkout-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.checkout-card-header i {
+    font-size: 18px;
+    color: #4A7C2C;
+    width: 36px;
+    height: 36px;
+    background: #eaf3de;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkout-card-header h3 {
+    font-size: 17px;
+    color: #222;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ===== FORM TRONG CHECKOUT ===== */
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.checkout-card .form-group {
+    margin-bottom: 16px;
+}
+
+.checkout-card .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.required {
+    color: #e74c3c;
+}
+
+.input-icon-wrap {
+    position: relative;
+}
+
+.input-icon-wrap i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #4A7C2C;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+.input-icon-wrap input {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 14px;
+    background: #fafafa;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.input-icon-wrap input:focus {
+    outline: none;
+    border-color: #4A7C2C;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(74,124,44,0.12);
+}
+
+.checkout-card textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 14px;
+    background: #fafafa;
+    resize: vertical;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.checkout-card textarea:focus {
+    outline: none;
+    border-color: #4A7C2C;
+}
+
+/* ===== PAYMENT OPTIONS ===== */
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.payment-option {
+    display: block;
+    cursor: pointer;
+}
+
+.payment-option input[type="radio"] {
+    display: none;
+}
+
+.payment-option-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 12px;
+    transition: all 0.2s;
+    background: #fafafa;
+}
+
+.payment-option input:checked + .payment-option-content {
+    border-color: #4A7C2C;
+    background: #f4fbf1;
+}
+
+.payment-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.cod-icon   { background: #fff3e0; color: #e67e22; }
+.bank-icon  { background: #e3f2fd; color: #1565c0; }
+.ewallet-icon { background: #fce4ec; color: #c2185b; }
+
+.payment-info {
+    flex: 1;
+}
+
+.payment-info strong {
+    display: block;
+    font-size: 14px;
+    color: #222;
+    margin-bottom: 3px;
+}
+
+.payment-info span {
+    font-size: 12px;
+    color: #888;
+}
+
+.payment-check {
+    color: #e0e0e0;
+    font-size: 20px;
+    transition: color 0.2s;
+}
+
+.payment-option input:checked + .payment-option-content .payment-check {
+    color: #4A7C2C;
+}
+
+/* ===== BANK DETAIL PANEL ===== */
+.bank-detail-panel {
+    background: #f8fdf5;
+    border: 1px solid #d4edba;
+    border-radius: 12px;
+    margin-top: 4px;
+    overflow: hidden;
+    display: none;
+}
+
+.bank-detail-panel.show {
+    display: block;
+}
+
+.bank-detail-inner {
+    padding: 20px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.qr-section {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.qr-placeholder img {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    object-fit: cover;
+}
+
+.qr-fallback {
+    width: 140px;
+    height: 140px;
+    background: #eaf3de;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #4A7C2C;
+    font-size: 13px;
+}
+
+.qr-fallback i { font-size: 40px; }
+
+.qr-hint {
+    font-size: 11px;
+    color: #888;
+    margin-top: 8px;
+}
+
+.bank-info-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bank-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #e0e0e0;
+    font-size: 13px;
+}
+
+.bank-info-item:last-of-type { border-bottom: none; }
+
+.bank-info-item span { color: #888; }
+.bank-info-item strong { color: #222; font-weight: 600; }
+
+.amount-highlight { color: #4A7C2C; font-size: 16px; font-weight: 700; }
+
+.copy-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-copy {
+    background: #eaf3de;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #4A7C2C;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+.btn-copy:hover { background: #d4edba; }
+.btn-copy.copied { background: #4A7C2C; color: #fff; }
+
+.bank-transfer-note-box {
+    background: #fffde7;
+    border: 1px solid #f9d71c;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #6d5200;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.bank-transfer-note-box i { color: #f39c12; margin-top: 2px; flex-shrink: 0; }
+
+/* ===== EWALLET PANEL ===== */
+.ewallet-panel {
+    background: #fdf5fb;
+    border: 1px solid #f0c0e0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 4px;
+}
+
+.ewallet-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.ewallet-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.ewallet-btn img { width: 32px; height: 32px; object-fit: contain; }
+.ewallet-btn.active { border-color: #c2185b; background: #fce4ec; color: #c2185b; }
+
+.ewallet-note {
+    font-size: 12px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+
+.ewallet-note i { color: #c2185b; }
+
+/* ===== ORDER SUMMARY ===== */
+.order-summary-card .order-items {
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.order-items .order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #555;
+    border-bottom: 1px dashed #f0f0f0;
+}
+
+.order-items .order-item:last-child { border-bottom: none; }
+
+.order-item-name {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.order-item-qty {
+    font-size: 12px;
+    background: #eaf3de;
+    color: #4A7C2C;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* Mã giảm giá */
+.coupon-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.coupon-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+}
+
+.coupon-row input:focus { border-color: #4A7C2C; }
+
+.btn-apply-coupon {
+    background: #4A7C2C;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.btn-apply-coupon:hover { background: #367018; }
+
+/* Tổng tiền */
+.order-totals {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+}
+
+.free-ship { color: #4A7C2C; font-size: 13px; }
+.free-ship i { margin-right: 4px; }
+.discount-value { color: #e74c3c; font-weight: 600; }
+
+.grand-total {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4A7C2C;
+    padding-top: 12px;
+    border-top: 2px solid #eef5ea;
+}
+
+/* Cam kết */
+.checkout-guarantees {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #f4fbf1;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+
+.guarantee-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #4A7C2C;
+}
+
+.guarantee-item i { font-size: 15px; }
+
+/* Nút đặt hàng */
+.btn-place-order {
+    width: 100%;
+    padding: 15px;
+    background: #4A7C2C;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 16px rgba(74,124,44,0.3);
+}
+
+.btn-place-order:hover {
+    background: #367018;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74,124,44,0.4);
+}
+
+.btn-place-order:active { transform: translateY(0); }
+
+/* Responsive */
+@media (max-width: 900px) {
+    .checkout-container { flex-direction: column; }
+    .checkout-right { position: static; }
+    .form-row-2 { grid-template-columns: 1fr; }
+    .bank-detail-inner { flex-direction: column; align-items: center; }
 }

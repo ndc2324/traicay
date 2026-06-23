@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script></head>
 <body>
 
     <!-- Header -->
@@ -33,7 +33,6 @@
             <div class="header-right">
                 <div class="icon-button cart-icon" onclick="navigateTo('cart')">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="icon-text">Giỏ hàng</span>
                     <span class="badge" id="cart-badge">0</span>
                 </div>
 
@@ -222,7 +221,91 @@
                 </div>
             </div>
         </div>
+
+    <section class="why-us-section">
+        <div class="why-left">
+            <h2>
+                Tại sao bạn lựa chọn chúng tôi
+            </h2>
+
+            <p class="why-desc">
+                Fresh Fruit cung cấp đa dạng trái cây trong nước và nhập khẩu,
+                đảm bảo chất lượng, nguồn gốc rõ ràng và mang đến trải nghiệm
+                tốt nhất cho khách hàng.
+            </p>
+
+            <ul class="why-list">
+                <li>Tận tâm với khách hàng và người tiêu dùng</li>
+                <li>Hệ thống cửa hàng trên toàn quốc</li>
+                <li>Quy trình sản phẩm đạt chuẩn chất lượng</li>
+                <li>Công nghệ bảo quản hiện đại</li>
+            </ul>
+        </div>
+
+        <div class="why-right">
+            <img
+                    src="https://img1.kienthucvui.vn/uploads/2021/12/23/hinh-anh-trai-cay-cac-loai_094110718.jpg"
+                    alt="Fresh Fruit">
+
+            <div class="testimonial-box">
+
+                <div class="testimonial-content active">
+                    <p>
+                        "Trái cây tại Fresh Fruit luôn tươi ngon,
+                        nguồn gốc rõ ràng và dịch vụ rất tận tâm."
+                    </p>
+
+                    <div class="testimonial-user">
+                        <img src="https://cdn.mosflyvn.com/upload/mosflyvn_com/post/images/2024/04/29/408/meme-huan-hoa-hong-10-diem-2.jpg">
+                        <div>
+                            <h4>Huấn Hoa Hồng</h4>
+                            <span>Khách hàng thân thiết</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-content">
+                    <p>
+                        "Tôi rất yên tâm khi mua trái cây tại Fresh Fruit,
+                        sản phẩm chất lượng và rất sạch sẽ."
+                    </p>
+
+                    <div class="testimonial-user">
+                        <img src="https://tse2.mm.bing.net/th/id/OIP.qoMRLMUa449l3EjGRKEWTAHaJ4?pid=Api&P=0&h=180">
+                        <div>
+                            <h4>Trường Con</h4>
+                            <span>Nhân viên văn phòng</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-content">
+                    <p>
+                        "Gia đình tôi đã sử dụng sản phẩm của Fresh Fruit
+                        nhiều năm và luôn hài lòng về chất lượng."
+                    </p>
+
+                    <div class="testimonial-user">
+                        <img src="https://cdn.tech24.vn/upload/tech24_vn/post/images/2024/06/17/557/kha-banh-meme-3.jpg">
+                        <div>
+                            <h4>Lê Bá Khá</h4>
+                            <span>Khách hàng VIP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-dots">
+                    <span class="t-dot active"></span>
+                    <span class="t-dot"></span>
+                    <span class="t-dot"></span>
+                </div>
+
+            </div>
+        </div>
+    </section>
         </section>
+
+
         <!-- About Page -->
         <section id="about" class="page-section">
             <div class="about-section">
@@ -442,65 +525,255 @@
             </div>
         </section>
 
-        <!-- Checkout Page -->
         <section id="checkout" class="page-section">
             <div class="checkout-section">
                 <h1>Thanh Toán</h1>
-                <div class="checkout-container">
-                    <div class="checkout-form">
-                        <h3>Thông tin giao hàng</h3>
-                        <form id="order-form">
-                            <div class="form-group">
-                                <label>Họ tên:</label>
-                                <input type="text" id="fullname" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Số điện thoại:</label>
-                                <input type="tel" id="phone" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Địa chỉ:</label>
-                                <input type="text" id="address" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Ghi chú:</label>
-                                <textarea id="notes" rows="3"></textarea>
-                            </div>
-                        </form>
+
+                <!-- Thanh tiến trình -->
+                <div class="checkout-steps">
+                    <div class="step active">
+                        <div class="step-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <span>Giỏ hàng</span>
                     </div>
-                    <div class="checkout-summary">
-                        <h3>Đơn hàng của bạn</h3>
-                        <div class="order-items" id="checkout-items">
-                            <p class="empty-cart">Không có sản phẩm</p>
+                    <div class="step-line"></div>
+                    <div class="step active">
+                        <div class="step-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <span>Giao hàng</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-icon"><i class="fas fa-credit-card"></i></div>
+                        <span>Thanh toán</span>
+                    </div>
+                </div>
+
+                <div class="checkout-container">
+                    <!-- CỘT TRÁI: Thông tin giao hàng + Phương thức thanh toán -->
+                    <div class="checkout-left">
+
+                        <!-- Thông tin giao hàng -->
+                        <div class="checkout-card">
+                            <div class="checkout-card-header">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <h3>Thông tin giao hàng</h3>
+                            </div>
+                            <form id="order-form">
+                                <div class="form-row-2">
+                                    <div class="form-group">
+                                        <label>Họ và tên <span class="required">*</span></label>
+                                        <div class="input-icon-wrap">
+                                            <i class="fas fa-user"></i>
+                                            <input type="text" id="fullname" placeholder="Nguyễn Văn A" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Số điện thoại <span class="required">*</span></label>
+                                        <div class="input-icon-wrap">
+                                            <i class="fas fa-phone"></i>
+                                            <input type="tel" id="phone" placeholder="0912 345 678" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Địa chỉ giao hàng <span class="required">*</span></label>
+                                    <div class="input-icon-wrap">
+                                        <i class="fas fa-home"></i>
+                                        <input type="text" id="address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ghi chú đơn hàng</label>
+                                    <textarea id="notes" rows="3" placeholder="Ghi chú thêm (giao giờ nào, cổng nào,...)"></textarea>
+                                </div>
+                            </form>
                         </div>
-                        <div class="summary-item">
-                            <label>Tạm tính:</label>
-                            <span id="checkout-subtotal">0đ</span>
+
+                        <!-- Phương thức thanh toán -->
+                        <div class="checkout-card">
+                            <div class="checkout-card-header">
+                                <i class="fas fa-credit-card"></i>
+                                <h3>Phương thức thanh toán</h3>
+                            </div>
+
+                            <div class="payment-options">
+
+                                <!-- COD -->
+                                <label class="payment-option" id="opt-cod">
+                                    <input type="radio" name="payment" value="cod" onchange="onPaymentChange('cod')">
+                                    <div class="payment-option-content">
+                                        <div class="payment-icon cod-icon">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </div>
+                                        <div class="payment-info">
+                                            <strong>Thanh toán khi nhận hàng (COD)</strong>
+                                            <span>Trả tiền mặt khi nhận hàng tại nhà</span>
+                                        </div>
+                                        <div class="payment-check"><i class="fas fa-check-circle"></i></div>
+                                    </div>
+                                </label>
+
+                                <!-- Chuyển khoản ngân hàng -->
+                                <label class="payment-option" id="opt-transfer">
+                                    <input type="radio" name="payment" value="transfer" checked onchange="onPaymentChange('transfer')">
+                                    <div class="payment-option-content">
+                                        <div class="payment-icon bank-icon">
+                                            <i class="fas fa-university"></i>
+                                        </div>
+                                        <div class="payment-info">
+                                            <strong>Chuyển khoản ngân hàng</strong>
+                                            <span>Quét QR hoặc chuyển khoản thủ công</span>
+                                        </div>
+                                        <div class="payment-check"><i class="fas fa-check-circle"></i></div>
+                                    </div>
+                                </label>
+
+                                <!-- Chi tiết chuyển khoản (hiện khi chọn) -->
+                                <div class="bank-detail-panel" id="bank-detail-panel">
+                                    <div class="bank-detail-inner">
+                                        <div class="qr-section">
+                                            <div class="qr-placeholder">
+                                                <!-- QR thật nên tạo bằng API VietQR hoặc dùng ảnh tĩnh -->
+                                                <img src="https://img.vietqr.io/image/VCB-1234567890-compact2.jpg?amount=0&addInfo=ThanhToanFreshFruit&accountName=FRESH%20FRUIT"
+                                                     alt="QR Thanh toán"
+                                                     onerror="this.parentElement.innerHTML='<div class=qr-fallback><i class=fas fa-qrcode></i><p>QR thanh toán</p></div>'">
+                                            </div>
+                                            <p class="qr-hint">Quét để thanh toán tự động</p>
+                                        </div>
+                                        <div class="bank-info-list">
+                                            <div class="bank-info-item">
+                                                <span>Ngân hàng</span>
+                                                <strong>Vietcombank (VCB)</strong>
+                                            </div>
+                                            <div class="bank-info-item">
+                                                <span>Số tài khoản</span>
+                                                <div class="copy-row">
+                                                    <strong id="bank-account-number">1234567890</strong>
+                                                    <button class="btn-copy" onclick="copyText('1234567890', this)" title="Sao chép">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="bank-info-item">
+                                                <span>Chủ tài khoản</span>
+                                                <strong>FRESH FRUIT CO.</strong>
+                                            </div>
+                                            <div class="bank-info-item">
+                                                <span>Số tiền</span>
+                                                <strong class="amount-highlight" id="bank-transfer-amount">0đ</strong>
+                                            </div>
+                                            <div class="bank-info-item">
+                                                <span>Nội dung CK</span>
+                                                <div class="copy-row">
+                                                    <strong id="bank-transfer-note">FF + SĐT của bạn</strong>
+                                                    <button class="btn-copy" onclick="copyBankNote(this)" title="Sao chép">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="bank-transfer-note-box">
+                                                <i class="fas fa-info-circle"></i>
+                                                Đơn hàng sẽ được xác nhận trong vòng <strong>15 phút</strong> sau khi chuyển khoản thành công.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Ví điện tử -->
+                                <label class="payment-option" id="opt-ewallet">
+                                    <input type="radio" name="payment" value="ewallet" onchange="onPaymentChange('ewallet')">
+                                    <div class="payment-option-content">
+                                        <div class="payment-icon ewallet-icon">
+                                            <i class="fas fa-wallet"></i>
+                                        </div>
+                                        <div class="payment-info">
+                                            <strong>Ví điện tử</strong>
+                                            <span>MoMo, ZaloPay, VNPay</span>
+                                        </div>
+                                        <div class="payment-check"><i class="fas fa-check-circle"></i></div>
+                                    </div>
+                                </label>
+
+                                <!-- Chi tiết ví điện tử -->
+                                <div class="ewallet-panel" id="ewallet-panel" style="display:none;">
+                                    <div class="ewallet-options">
+                                        <button class="ewallet-btn active" onclick="selectEwallet(this, 'momo')">
+                                            <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" onerror="this.style.display='none'">
+                                            <span>MoMo</span>
+                                        </button>
+                                        <button class="ewallet-btn" onclick="selectEwallet(this, 'zalopay')">
+                                            <img src="https://zalopay.vn/images/logo.svg" alt="ZaloPay" onerror="this.style.display='none'">
+                                            <span>ZaloPay</span>
+                                        </button>
+                                        <button class="ewallet-btn" onclick="selectEwallet(this, 'vnpay')">
+                                            <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png" alt="VNPay" onerror="this.style.display='none'">
+                                            <span>VNPay</span>
+                                        </button>
+                                    </div>
+                                    <p class="ewallet-note"><i class="fas fa-info-circle"></i> Bạn sẽ được chuyển đến ứng dụng ví để hoàn tất thanh toán sau khi đặt hàng.</p>
+                                </div>
+
+                            </div>
                         </div>
-                        <div class="summary-item">
-                            <label>Phí vận chuyển:</label>
-                            <span>Miễn phí</span>
+                    </div>
+
+                    <!-- CỘT PHẢI: Tóm tắt đơn hàng -->
+                    <div class="checkout-right">
+                        <div class="checkout-card order-summary-card">
+                            <div class="checkout-card-header">
+                                <i class="fas fa-shopping-bag"></i>
+                                <h3>Đơn hàng của bạn</h3>
+                            </div>
+
+                            <div class="order-items" id="checkout-items">
+                                <p class="empty-cart">Không có sản phẩm</p>
+                            </div>
+
+                            <!-- Mã giảm giá -->
+                            <div class="coupon-row">
+                                <input type="text" id="checkout-coupon" placeholder="Nhập mã giảm giá">
+                                <button class="btn-apply-coupon" onclick="applyCoupon()">Áp dụng</button>
+                            </div>
+
+                            <div class="order-totals">
+                                <div class="total-row">
+                                    <span>Tạm tính</span>
+                                    <span id="checkout-subtotal">0đ</span>
+                                </div>
+                                <div class="total-row">
+                                    <span>Phí vận chuyển</span>
+                                    <span class="free-ship"><i class="fas fa-truck"></i> Miễn phí</span>
+                                </div>
+                                <div class="total-row discount-row" id="discount-row" style="display:none;">
+                                    <span>Giảm giá</span>
+                                    <span id="discount-amount" class="discount-value">-0đ</span>
+                                </div>
+                                <div class="total-row grand-total">
+                                    <span>Tổng cộng</span>
+                                    <span id="checkout-total">0đ</span>
+                                </div>
+                            </div>
+
+                            <!-- Cam kết -->
+                            <div class="checkout-guarantees">
+                                <div class="guarantee-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Bảo mật thanh toán 100%</span>
+                                </div>
+                                <div class="guarantee-item">
+                                    <i class="fas fa-undo"></i>
+                                    <span>Đổi trả miễn phí 24h</span>
+                                </div>
+                                <div class="guarantee-item">
+                                    <i class="fas fa-leaf"></i>
+                                    <span>Hàng tươi đảm bảo</span>
+                                </div>
+                            </div>
+
+                            <button class="btn-place-order" onclick="placeOrder()">
+                                <i class="fas fa-check-circle"></i>
+                                Đặt hàng ngay
+                            </button>
                         </div>
-                        <div class="summary-item total">
-                            <label>Tổng cộng:</label>
-                            <span id="checkout-total">0đ</span>
-                        </div>
-                        <div class="payment-method">
-                            <h4>Phương thức thanh toán:</h4>
-                            <label>
-                                <input type="radio" name="payment" value="transfer" checked>
-                                Chuyển khoản
-                            </label>
-                            <label>
-                                <input type="radio" name="payment" value="cod">
-                                COD (Thanh toán khi nhận hàng)
-                            </label>
-                            <label>
-                                <input type="radio" name="payment" value="ewallet">
-                                Ví điện tử
-                            </label>
-                        </div>
-                        <button class="btn-order" onclick="placeOrder()">Đặt hàng ngay</button>
                     </div>
                 </div>
             </div>
@@ -634,22 +907,28 @@
 
 
 
-        <!-- Login Page -->
         <section id="login" class="page-section">
             <div class="auth-section">
                 <div class="auth-container">
                     <div class="auth-form">
                         <h2>Đăng Nhập</h2>
+                        <p class="auth-subtitle">Vui lòng đăng nhập để tiếp tục</p>
                         <form id="login-form">
                             <div class="form-group">
-                                <label>Tên đăng nhập:</label>
-                                <input type="text" id="login-username" required>
+                                <label>Tên đăng nhập</label>
+                                <div class="input-wrapper">
+                                    <i class="far fa-user"></i>
+                                    <input type="text" id="login-username" placeholder="Nhập tên đăng nhập" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Mật khẩu:</label>
-                                <input type="password" id="login-password" required>
+                                <label>Mật khẩu</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="login-password" placeholder="Nhập mật khẩu" required>
+                                </div>
                             </div>
-                            <button type="submit" class="btn-primary">Đăng nhập</button>
+                            <button type="submit" class="btn-primary auth-btn">Đăng nhập</button>
                         </form>
                         <p class="auth-switch">Chưa có tài khoản? <a href="#" onclick="navigateTo('register')">Đăng ký ngay</a></p>
                     </div>
@@ -657,38 +936,56 @@
             </div>
         </section>
 
-        <!-- Register Page -->
         <section id="register" class="page-section">
             <div class="auth-section">
                 <div class="auth-container">
                     <div class="auth-form">
                         <h2>Đăng Ký</h2>
+                        <p class="auth-subtitle">Tạo tài khoản mới</p>
                         <form id="register-form">
                             <div class="form-group">
-                                <label>Tên đăng nhập:</label>
-                                <input type="text" id="register-username" required>
+                                <label>Tên đăng nhập</label>
+                                <div class="input-wrapper">
+                                    <i class="far fa-user"></i>
+                                    <input type="text" id="register-username" placeholder="Nhập tên đăng nhập" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Mật khẩu:</label>
-                                <input type="password" id="register-password" required>
+                                <label>Mật khẩu</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="register-password" placeholder="Nhập mật khẩu" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Họ tên:</label>
-                                <input type="text" id="register-fullname" required>
+                                <label>Họ tên</label>
+                                <div class="input-wrapper">
+                                    <i class="far fa-id-badge"></i>
+                                    <input type="text" id="register-fullname" placeholder="Nhập họ tên đầy đủ" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Email:</label>
-                                <input type="email" id="register-email" required>
+                                <label>Email</label>
+                                <div class="input-wrapper">
+                                    <i class="far fa-envelope"></i>
+                                    <input type="email" id="register-email" placeholder="Nhập địa chỉ email" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Số điện thoại:</label>
-                                <input type="tel" id="register-phone" required>
+                                <label>Số điện thoại</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="tel" id="register-phone" placeholder="Nhập số điện thoại" required>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Địa chỉ:</label>
-                                <input type="text" id="register-address" required>
+                                <label>Địa chỉ</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <input type="text" id="register-address" placeholder="Nhập địa chỉ giao hàng" required>
+                                </div>
                             </div>
-                            <button type="submit" class="btn-primary">Đăng ký</button>
+                            <button type="submit" class="btn-primary auth-btn">Đăng ký</button>
                         </form>
                         <p class="auth-switch">Đã có tài khoản? <a href="#" onclick="navigateTo('login')">Đăng nhập ngay</a></p>
                     </div>
@@ -806,88 +1103,6 @@
             </div>
         </section>
 
-
-        <section class="why-us-section">
-            <div class="why-left">
-                <h2>
-                Tại sao bạn lựa chọn chúng tôi
-                </h2>
-
-                <p class="why-desc">
-                    Fresh Fruit cung cấp đa dạng trái cây trong nước và nhập khẩu,
-                    đảm bảo chất lượng, nguồn gốc rõ ràng và mang đến trải nghiệm
-                    tốt nhất cho khách hàng.
-                </p>
-
-                <ul class="why-list">
-                    <li>Tận tâm với khách hàng và người tiêu dùng</li>
-                    <li>Hệ thống cửa hàng trên toàn quốc</li>
-                    <li>Quy trình sản phẩm đạt chuẩn chất lượng</li>
-                    <li>Công nghệ bảo quản hiện đại</li>
-                </ul>
-            </div>
-
-            <div class="why-right">
-                <img
-                        src="https://img1.kienthucvui.vn/uploads/2021/12/23/hinh-anh-trai-cay-cac-loai_094110718.jpg"
-                        alt="Fresh Fruit">
-
-                <div class="testimonial-box">
-
-                    <div class="testimonial-content active">
-                        <p>
-                            Trái cây tại Fresh Fruit luôn tươi ngon,
-                            nguồn gốc rõ ràng và dịch vụ rất tận tâm.
-                        </p>
-
-                        <div class="testimonial-user">
-                            <img src="https://cdn.mosflyvn.com/upload/mosflyvn_com/post/images/2024/04/29/408/meme-huan-hoa-hong-10-diem-2.jpg">
-                            <div>
-                                <h4>Huấn Hoa Hồng</h4>
-                                <span>Khách hàng thân thiết</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-content">
-                        <p>
-                            Tôi rất yên tâm khi mua trái cây tại Fresh Fruit,
-                            sản phẩm chất lượng.
-                        </p>
-
-                        <div class="testimonial-user">
-                            <img src="https://tse2.mm.bing.net/th/id/OIP.qoMRLMUa449l3EjGRKEWTAHaJ4?pid=Api&P=0&h=180">
-                            <div>
-                                <h4>TRường Con</h4>
-                                <span>Nhân viên văn phòng</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-content">
-                        <p>
-                            Gia đình tôi đã sử dụng sản phẩm của Fresh Fruit
-                            nhiều năm và luôn hài lòng.
-                        </p>
-
-                        <div class="testimonial-user">
-                            <img src="https://cdn.tech24.vn/upload/tech24_vn/post/images/2024/06/17/557/kha-banh-meme-3.jpg">
-                            <div>
-                                <h4>Lê Bá Khá</h4>
-                                <span>Khách hàng VIP</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-dots">
-                        <span class="t-dot active"></span>
-                        <span class="t-dot"></span>
-                        <span class="t-dot"></span>
-                    </div>
-
-                </div>
-            </div>
-        </section>
     <footer class="footer">
         <div class="footer-column">
             <h3>Liên hệ</h3>

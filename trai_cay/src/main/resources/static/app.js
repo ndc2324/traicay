@@ -126,14 +126,18 @@
                 avatarImg.style.display = 'block';
             }
 
-            if (userText) userText.textContent = currentUser.fullName || currentUser.username || 'Tài khoản';
-        } else {
-            if (profileLink) profileLink.style.display = 'none';
-            if (defaultIcon) defaultIcon.style.display = 'block';
-            if (avatarImg) avatarImg.style.display = 'none';
-            if (userText) userText.textContent = 'Đăng nhập';
-        }
-    }
+           if (userText) userText.style.display = 'none';
+
+               } else {
+                   if (profileLink) profileLink.style.display = 'none';
+                   if (defaultIcon) defaultIcon.style.display = 'block';
+                   if (avatarImg) avatarImg.style.display = 'none';
+                   if (userText) {
+                       userText.style.display = 'inline';
+                       userText.textContent = 'Đăng nhập';
+                   }
+               }
+           }
 
     // Click vào icon user trên header
     function handleUserIconClick() {
@@ -436,10 +440,10 @@
                 </div>
 
                 <button class="btn-add-cart"
-                    ${!product.available ? 'disabled' : ''}
-                    onclick="${product.available ? `showQuickBuyFromProduct(${product.id})` : ''}">
-                    ${product.available ? 'Mua nhanh' : 'Hết hàng'}
-                </button>
+                                    ${!product.available ? 'disabled' : ''}
+                                    onclick="${product.available ? `addDirectToCart(${product.id})` : ''}">
+                                    ${product.available ? 'Thêm vào giỏ' : 'Hết hàng'}
+                                </button>
             </div>
         `;
     }
@@ -577,6 +581,12 @@
 
 
     // ==================== CART ====================
+    function addDirectToCart(productId) {
+            const product = productsFromDb.find(p => p.id === productId);
+            if (product) {
+                addToCart(product.name, product.price, 1);
+            }
+        }
     function addToCart(name, price, quantity = 1) {
         if (!currentUser) {
             alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
@@ -684,32 +694,146 @@
 
 
     // ==================== CHECKOUT ====================
-    function renderCheckout() {
-        const checkoutItems = document.getElementById('checkout-items');
-        if (!checkoutItems) return;
 
-        if (cart.length === 0) {
-            checkoutItems.innerHTML = '<p class="empty-cart">Không có sản phẩm</p>';
-            document.getElementById('checkout-subtotal').textContent = '0đ';
-            document.getElementById('checkout-total').textContent = '0đ';
-            return;
-        }
 
-        let subtotal = 0;
-        checkoutItems.innerHTML = cart.map(item => {
-            const itemTotal = item.price * item.quantity;
-            subtotal += itemTotal;
-            return `
-                <div class="order-item">
-                    <span>${item.name} x ${item.quantity}</span>
-                    <span>${formatPrice(itemTotal)}</span>
-                </div>
-            `;
-        }).join('');
+  function onPaymentChange(method) {
+      const bankPanel = document.getElementById('bank-detail-panel');
+      const ewalletPanel = document.getElementById('ewallet-panel');
 
-        document.getElementById('checkout-subtotal').textContent = formatPrice(subtotal);
-        document.getElementById('checkout-total').textContent = formatPrice(subtotal);
-    }
+      if (bankPanel) bankPanel.classList.remove('show');
+      if (ewalletPanel) ewalletPanel.style.display = 'none';
+
+      if (method === 'transfer') {
+          if (bankPanel) {
+              bankPanel.classList.add('show');
+              updateBankTransferAmount();
+          }
+      } else if (method === 'ewallet') {
+          if (ewalletPanel) ewalletPanel.style.display = 'block';
+      }
+  }
+
+  function updateBankTransferAmount() {
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const el = document.getElementById('bank-transfer-amount');
+      if (el) el.textContent = formatPrice(subtotal);
+  }
+
+  function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+          const icon = btn.querySelector('i');
+          if (icon) icon.className = 'fas fa-check';
+          btn.classList.add('copied');
+          setTimeout(() => {
+              if (icon) icon.className = 'fas fa-copy';
+              btn.classList.remove('copied');
+          }, 2000);
+      }).catch(() => {
+          const el = document.createElement('textarea');
+          el.value = text;
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand('copy');
+          document.body.removeChild(el);
+      });
+  }
+
+  function copyBankNote(btn) {
+      const phone = document.getElementById('phone')?.value || 'SĐT';
+      const note = 'FF' + phone;
+      copyText(note, btn);
+  }
+
+  function selectEwallet(btn, wallet) {
+      document.querySelectorAll('.ewallet-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+  }
+
+  function applyCoupon() {
+      const code = document.getElementById('checkout-coupon')?.value.trim().toUpperCase();
+      if (!code) return;
+
+      // Danh sách mã giảm giá mẫu - thay bằng API thật
+      const coupons = {
+          'FRESH10': 0.10,
+          'WELCOME20': 0.20,
+          'SUMMER15': 0.15
+      };
+
+      const discountRate = coupons[code];
+      const discountRow = document.getElementById('discount-row');
+      const discountAmount = document.getElementById('discount-amount');
+      const totalEl = document.getElementById('checkout-total');
+
+      if (discountRate) {
+          const subtotal = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+          const discount = Math.round(subtotal * discountRate);
+          const finalTotal = subtotal - discount;
+
+          if (discountRow) discountRow.style.display = 'flex';
+          if (discountAmount) discountAmount.textContent = '-' + formatPrice(discount);
+          if (totalEl) totalEl.textContent = formatPrice(finalTotal);
+
+          alert(`Áp dụng mã "${code}" thành công! Giảm ${(discountRate * 100).toFixed(0)}%`);
+      } else {
+          alert('Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+      }
+  }
+
+  // Override renderCheckout để cập nhật UI mới
+  const _originalRenderCheckout = typeof renderCheckout === 'function' ? renderCheckout : null;
+
+  function renderCheckout() {
+      const checkoutItems = document.getElementById('checkout-items');
+      if (!checkoutItems) return;
+
+      if (cart.length === 0) {
+          checkoutItems.innerHTML = '<p class="empty-cart">Không có sản phẩm</p>';
+          ['checkout-subtotal', 'checkout-total', 'bank-transfer-amount'].forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.textContent = '0đ';
+          });
+          return;
+      }
+
+      let subtotal = 0;
+      checkoutItems.innerHTML = cart.map(item => {
+          const itemTotal = item.price * item.quantity;
+          subtotal += itemTotal;
+          return `
+              <div class="order-item">
+                  <div class="order-item-name">
+                      <span>${item.name}</span>
+                      <span class="order-item-qty">x${item.quantity}</span>
+                  </div>
+                  <span>${formatPrice(itemTotal)}</span>
+              </div>
+          `;
+      }).join('');
+
+      ['checkout-subtotal', 'checkout-total'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = formatPrice(subtotal);
+      });
+
+      // Điền sẵn thông tin nếu đã đăng nhập
+      if (currentUser) {
+          const fullnameEl = document.getElementById('fullname');
+          const phoneEl = document.getElementById('phone');
+          const addressEl = document.getElementById('address');
+          if (fullnameEl && !fullnameEl.value) fullnameEl.value = currentUser.fullName || '';
+          if (phoneEl && !phoneEl.value) phoneEl.value = currentUser.phone || '';
+          if (addressEl && !addressEl.value) addressEl.value = currentUser.address || '';
+      }
+
+      // Mặc định hiện panel chuyển khoản (vì radio checked=transfer)
+      const transferRadio = document.querySelector('input[name="payment"][value="transfer"]');
+      if (transferRadio && transferRadio.checked) {
+          onPaymentChange('transfer');
+      }
+
+      updateBankTransferAmount();
+  }
 
     function placeOrder() {
         if (cart.length === 0) {
