@@ -5,9 +5,10 @@ let currentUser = null;
 let authToken = null;
 
 const orderStatusLabel = {
-    PROCESSING: 'Đang xử lý',
+    PENDING: 'Chờ xác nhận',
+    CONFIRMED: 'Đã xác nhận',
     SHIPPED: 'Đang giao',
-    DELIVERED: 'Hoàn thành',
+    DELIVERED: 'Đã giao',
     CANCELLED: 'Đã hủy'
 };
 
@@ -105,7 +106,7 @@ function renderOrderTable(orders) {
 
     orders.forEach(order => {
         const statusClass =
-            order.status === 'PROCESSING' ? 'badge-warning' :
+            order.status === 'PENDING' ? 'badge-warning' :
             order.status === 'CONFIRMED' ? 'badge-success' :
             order.status === 'SHIPPED' ? 'badge-warning' :
             order.status === 'DELIVERED' ? 'badge-success' :
@@ -120,13 +121,7 @@ function renderOrderTable(orders) {
             <td>${new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
             <td>
                 <button class="btn-secondary" onclick="openOrderDetail(${order.id})">Xem</button>
-
-                <select class="status-select" onchange="updateOrderStatus(${order.id}, this.value)">
-                    <option value="PROCESSING" ${order.status === 'PROCESSING' ? 'selected' : ''}>Đang xử lý</option>
-                    <option value="SHIPPED" ${order.status === 'SHIPPED' ? 'selected' : ''}>Đang giao</option>
-                    <option value="DELIVERED" ${order.status === 'DELIVERED' ? 'selected' : ''}>Hoàn thành</option>
-                    <option value="CANCELLED" ${order.status === 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
-                </select>
+                <button class="btn-secondary" onclick="updateOrderStatus(${order.id}, this)">Cập nhật</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -160,7 +155,13 @@ function renderCategoryTable(categories) {
 
 
 function loadAdminProducts() {
-    fetch('/api/products/all')
+    const options = {};
+    if (authToken) {
+        options.headers = {
+            'Authorization': 'Bearer ' + authToken
+        };
+    }
+    fetch('/api/products/all', options)
         .then(response => response.json())
         .then(products => {
             adminProducts = products;
@@ -170,8 +171,18 @@ function loadAdminProducts() {
 }
 
 function loadAdminOrders(status = 'ALL') {
-    fetch('/api/orders')
-        .then(response => response.json())
+    const options = {
+        headers: {
+            'Authorization': 'Bearer ' + authToken
+        }
+    };
+    fetch('/api/orders', options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(orders => {
             adminOrders = orders;
             const filtered = status === 'ALL' ? orders : orders.filter(order => order.status === status);
@@ -404,7 +415,11 @@ function deleteCategory(categoryId) {
 }
 
 function openOrderDetail(orderId) {
-    fetch(`/api/orders/${orderId}`)
+    fetch(`/api/orders/${orderId}`, {
+        headers: {
+            'Authorization': 'Bearer ' + authToken
+        }
+    })
         .then(response => response.json())
         .then(order => {
             document.getElementById('order-detail-code').textContent = `Mã đơn: #${order.id}`;
@@ -417,11 +432,16 @@ function openOrderDetail(orderId) {
             itemsBody.innerHTML = '';
             if (Array.isArray(order.items) && order.items.length) {
                 order.items.forEach(item => {
+                    const productName = item.productName || item.name || (item.product && (item.product.name || item.product.title)) || 'Sản phẩm';
+                    const quantity = (item.quantity || item.qty || 0);
+                    const unitPrice = (item.price || item.unitPrice || (item.product && item.product.price) || 0);
+                    const subtotal = (unitPrice * quantity) || 0;
+
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${(item.price * item.quantity).toLocaleString('vi-VN')}đ</td>
+                        <td>${productName}</td>
+                        <td>${quantity}</td>
+                        <td>${subtotal.toLocaleString('vi-VN')}đ</td>
                     `;
                     itemsBody.appendChild(row);
                 });
@@ -441,38 +461,106 @@ function closeOrderDetail() {
     document.getElementById('order-detail-modal').classList.remove('show');
 }
 
-function updateOrderStatus(id, status) {
+function updateOrderStatus(orderId, anchorEl) {
+    // Remove any existing menu
+    closeStatusMenu();
 
-    fetch(
-        `/api/orders/${id}/status`,
-        {
-            method: 'PUT',
-            headers: {
-                'Content-Type':
-                    'application/json'
-            },
-            body: JSON.stringify({
-                status: status
-            })
+    const validStatuses = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+    const statusLabels = {
+        PENDING: 'Chờ xác nhận',
+        CONFIRMED: 'Đã xác nhận',
+        SHIPPED: 'Đang giao',
+        DELIVERED: 'Đã giao',
+        CANCELLED: 'Đã hủy'
+    };
+
+    // Create menu container
+    const menu = document.createElement('div');
+    menu.className = 'status-menu';
+    menu.dataset.orderId = orderId;
+
+    validStatuses.forEach(s => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'status-option';
+        btn.innerHTML = `<span class="badge ${s === 'CONFIRMED' || s === 'DELIVERED' ? 'badge-success' : s === 'CANCELLED' ? 'badge-danger' : 'badge-warning'}">${statusLabels[s]}</span>`;
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            performStatusUpdate(orderId, s);
+            closeStatusMenu();
+        };
+        menu.appendChild(btn);
+    });
+
+    document.body.appendChild(menu);
+
+    // Position menu under anchorEl
+    try {
+        const rect = anchorEl.getBoundingClientRect();
+        menu.style.position = 'absolute';
+        menu.style.top = (window.scrollY + rect.bottom + 6) + 'px';
+        menu.style.left = Math.max(8, window.scrollX + rect.left - 120) + 'px';
+    } catch (err) {
+        // fallback center
+        menu.style.position = 'fixed';
+        menu.style.top = '50%';
+        menu.style.left = '50%';
+        menu.style.transform = 'translate(-50%, -50%)';
+    }
+
+    // Close menu when clicking elsewhere
+    setTimeout(() => {
+        document.addEventListener('click', onDocumentClickCloseMenu);
+    }, 0);
+}
+
+function performStatusUpdate(orderId, targetStatus) {
+    const validStatuses = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+    if (!validStatuses.includes(targetStatus)) {
+        alert('Trạng thái không hợp lệ.');
+        return;
+    }
+
+    fetch(`/api/orders/${orderId}/status?status=${targetStatus}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': 'Bearer ' + authToken
         }
-    )
+    })
     .then(response => {
-        if (!response.ok) {
-            throw new Error(
-                'Cập nhật thất bại'
-            );
-        }
+        if (response.ok) {
+            alert(`Cập nhật trạng thái đơn hàng #${orderId} thành công.`);
 
-        loadAdminOrders('ALL');
+            // Refresh admin list or dashboard
+            if (document.getElementById('admin-dashboard').classList.contains('active')) {
+                loadAdminDashboard();
+            } else {
+                loadAdminOrders('ALL');
+            }
+            closeOrderDetail();
+        } else {
+            alert('Cập nhật trạng thái thất bại.');
+        }
     })
     .catch(error => {
-        console.error(error);
-        alert(
-            'Không thể cập nhật trạng thái.'
-        );
+        console.error('Error updating order status:', error);
+        alert('Lỗi kết nối khi cập nhật trạng thái.');
     });
 }
 
+function closeStatusMenu() {
+    const existing = document.querySelectorAll('.status-menu');
+    existing.forEach(n => n.remove());
+    document.removeEventListener('click', onDocumentClickCloseMenu);
+}
+
+function onDocumentClickCloseMenu(e) {
+    // close when clicking outside menu
+    const menus = document.querySelectorAll('.status-menu');
+    if (!menus || menus.length === 0) return;
+    const clickedInside = Array.from(menus).some(m => m.contains(e.target));
+    if (!clickedInside) closeStatusMenu();
+}
 function loadAdminUser() {
     const savedUser = localStorage.getItem('currentUser');
     const savedToken = localStorage.getItem('authToken');
@@ -514,19 +602,34 @@ let revenueChart = null;
 let statusChart = null;
 let topProductsChart = null;
 let currentRevenuePeriod = 6;
+let currentRevenueGranularity = 'month';
+let demoOrdersEnabled = true;
+let demoInjected = false;
 
 // Gọi hàm này sau khi loadAdminDashboard() đã fetch xong data
 // Override loadAdminDashboard để thêm vẽ biểu đồ
 const _origLoadAdminDashboard = loadAdminDashboard;
 
 function loadAdminDashboard() {
+    const ordersOptions = {
+        headers: {
+            'Authorization': 'Bearer ' + authToken
+        }
+    };
     Promise.all([
         fetch('/api/products/all').then(r => r.json()),
-        fetch('/api/orders').then(r => r.json())
+        fetch('/api/orders', ordersOptions).then(r => r.json())
     ])
     .then(([products, orders]) => {
         adminProducts = Array.isArray(products) ? products : (products.data || products.content || []);
         adminOrders   = Array.isArray(orders)   ? orders   : (orders.data   || orders.content   || []);
+
+        // Inject demo orders for visualization (only once)
+        if (demoOrdersEnabled && !demoInjected) {
+            const demos = generateDemoOrders();
+            adminOrders = adminOrders.concat(demos);
+            demoInjected = true;
+        }
 
         // ---- Stat cards ----
         document.getElementById('stat-products').textContent = adminProducts.length;
@@ -553,7 +656,9 @@ function loadAdminDashboard() {
 
         // ---- Biểu đồ ----
         setTimeout(() => {
-            drawRevenueChart(adminOrders, currentRevenuePeriod);
+            // ensure granularity controls and defaults are rendered
+            renderRevenueDateControls();
+            setRevenueChartGranularity(currentRevenueGranularity, document.querySelector('.granularity-controls .chart-filter-btn.active'));
             drawStatusChart(adminOrders);
             drawTopProductsChart(adminOrders);
             renderRecentOrders(adminOrders);
@@ -565,105 +670,222 @@ function loadAdminDashboard() {
     });
 }
 
-// ---- Biểu đồ doanh thu theo tháng ----
-function drawRevenueChart(orders, months = 6) {
-    const ctx = document.getElementById('revenue-chart');
-    if (!ctx) return;
+// ---- Biểu đồ doanh thu theo tháng (clean implementation) ----
+function drawRevenueOverview(orders = [], granularity = 'month', period = 12) {
+    const mainCtx = document.getElementById('revenue-chart');
+    if (!mainCtx) return;
 
     const labels = [];
     const revenueData = [];
-    const orderCountData = [];
-    const now = new Date();
+    // optional start/end as 4th/5th args
+    const startArg = arguments[3] ? new Date(arguments[3]) : null;
+    const endArg = arguments[4] ? new Date(arguments[4]) : null;
 
-    for (let i = months - 1; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const label = `T${d.getMonth() + 1}/${d.getFullYear().toString().slice(2)}`;
-        labels.push(label);
-
-        const monthOrders = orders.filter(o => {
-            const od = new Date(o.createdAt);
-            return od.getMonth() === d.getMonth() && od.getFullYear() === d.getFullYear();
-        });
-
-        const rev = monthOrders
-            .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
-            .reduce((s, o) => s + (o.totalAmount || 0), 0);
-
-        revenueData.push(rev);
-        orderCountData.push(monthOrders.length);
+    // If user selected a month/year (we receive an endArg), render full 12 months for that year
+    if (endArg) {
+        const year = endArg.getFullYear();
+        for (let m = 0; m < 12; m++) {
+            labels.push(`T${m+1}`);
+            const rev = orders
+                .filter(o => {
+                    const od = new Date(o.createdAt);
+                    return od.getFullYear() === year && od.getMonth() === m;
+                })
+                .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
+                .reduce((s, o) => s + (o.totalAmount || 0), 0);
+            revenueData.push(rev);
+        }
+    } else {
+        // fallback: last `period` months up to now (but our UI will use 12)
+        const now = new Date();
+        for (let i = period - 1; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            labels.push(`T${d.getMonth() + 1}`);
+            const rev = orders
+                .filter(o => {
+                    const od = new Date(o.createdAt);
+                    return od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth();
+                })
+                .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
+                .reduce((s, o) => s + (o.totalAmount || 0), 0);
+            revenueData.push(rev);
+        }
     }
 
     if (revenueChart) revenueChart.destroy();
-
-    revenueChart = new Chart(ctx, {
+    revenueChart = new Chart(mainCtx, {
         type: 'bar',
         data: {
             labels,
-            datasets: [
-                {
-                    label: 'Doanh thu (đ)',
-                    data: revenueData,
-                    backgroundColor: 'rgba(74,124,44,0.75)',
-                    borderColor: '#4A7C2C',
-                    borderWidth: 2,
-                    borderRadius: 8,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Số đơn',
-                    data: orderCountData,
-                    type: 'line',
-                    borderColor: '#e67e22',
-                    backgroundColor: 'rgba(230,126,34,0.12)',
-                    borderWidth: 2.5,
-                    pointBackgroundColor: '#e67e22',
-                    pointRadius: 5,
-                    tension: 0.4,
-                    yAxisID: 'y1',
-                    fill: true
-                }
-            ]
+            datasets: [{
+                label: 'Doanh thu',
+                data: revenueData,
+                backgroundColor: '#1e4f1f',
+                borderRadius: 8,
+                barPercentage: 0.6
+            }]
         },
         options: {
             responsive: true,
-            interaction: { mode: 'index', intersect: false },
+            maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'top' },
+                legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: function(ctx) {
-                            if (ctx.datasetIndex === 0)
-                                return ' Doanh thu: ' + ctx.raw.toLocaleString('vi-VN') + 'đ';
-                            return ' Số đơn: ' + ctx.raw;
-                        }
+                        title: (items) => {
+                            const idx = items[0].dataIndex + 1;
+                            const year = endArg ? endArg.getFullYear().toString().slice(2) : (new Date()).getFullYear().toString().slice(2);
+                            return `T${idx}/${year}`;
+                        },
+                        label: (ctx) => ` ${ctx.raw.toLocaleString('vi-VN')}đ`
                     }
                 }
             },
             scales: {
-                y: {
-                    type: 'linear',
-                    position: 'left',
-                    ticks: {
-                        callback: v => (v / 1000000).toFixed(1) + 'tr'
-                    },
-                    grid: { color: 'rgba(0,0,0,0.05)' }
-                },
-                y1: {
-                    type: 'linear',
-                    position: 'right',
-                    grid: { display: false },
-                    ticks: { precision: 0 }
-                }
+                x: { grid: { display: false }, ticks: { maxRotation: 0 } },
+                y: { min: 0, max: 6000000, ticks: { stepSize: 2000000, callback: v => (v/1000000) + 'M' }, grid: { color: 'rgba(0,0,0,0.04)' } }
             }
         }
     });
+
+    // update KPI and change
+    const total = revenueData.reduce((s, v) => s + v, 0);
+    const kpiEl = document.getElementById('revenue-kpi');
+    if (kpiEl) kpiEl.textContent = total.toLocaleString('vi-VN') + 'đ';
+    const changeEl = document.getElementById('revenue-kpi-change');
+    if (changeEl) {
+        const last = revenueData[11] || 0;
+        const prev = revenueData[10] || 0;
+        const pct = prev ? Math.round(((last - prev) / prev) * 100) : 0;
+        changeEl.textContent = `${pct >= 0 ? '+' + pct + '%' : pct + '%'} ${pct >= 0 ? '▲' : '▼'} (so với tháng trước)`;
+    }
 }
 
-function setRevenueChartPeriod(months, btn) {
-    currentRevenuePeriod = months;
-    document.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    drawRevenueChart(adminOrders, months);
+function setRevenueChartPeriod(period, btn) {
+    currentRevenuePeriod = period;
+    // period buttons removed in simplified UI; just redraw with provided period
+    drawRevenueOverview(adminOrders, currentRevenueGranularity, currentRevenuePeriod);
+}
+
+function setRevenueChartGranularity(granularity, btn) {
+    currentRevenueGranularity = granularity;
+    // toggle granularity buttons
+    document.querySelectorAll('.granularity-controls .chart-filter-btn').forEach(b=>b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    // always render a single calendar picker; chart will show fixed 12 months ending at selected date
+    renderRevenueDateControls();
+    // default: show last 12 months ending now
+    const now = new Date();
+    const end = new Date(now.getFullYear(), now.getMonth(), 1);
+    const start = new Date(end.getFullYear(), end.getMonth() - 11, 1);
+    drawRevenueOverview(adminOrders, 'month', null, start, end);
+}
+
+function renderRevenueDateControls() {
+    const container = document.getElementById('revenue-date-controls');
+    if (!container) return;
+    container.innerHTML = '';
+    // single input: opens native calendar; on change, chart shows 12 months ending at chosen date
+    if (currentRevenueGranularity === 'day') {
+        const inp = document.createElement('input'); inp.type = 'date'; inp.id = 'rev-single-date'; inp.title = 'Chọn ngày';
+        inp.onchange = () => {
+            const v = inp.value; if (!v) return;
+            const end = new Date(v);
+            const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
+            const start = new Date(endMonth.getFullYear(), endMonth.getMonth() - 11, 1);
+            drawRevenueOverview(adminOrders, 'month', null, start, endMonth);
+        };
+        // default to today
+        const today = new Date();
+        inp.value = today.toISOString().slice(0,10);
+        container.appendChild(inp);
+    } else if (currentRevenueGranularity === 'month') {
+        const inp = document.createElement('input'); inp.type = 'month'; inp.id = 'rev-single-month'; inp.title = 'Chọn tháng';
+        inp.onchange = () => {
+            const v = inp.value; if (!v) return;
+            const [y,m] = v.split('-').map(Number);
+            const endMonth = new Date(y, m-1, 1);
+            const start = new Date(endMonth.getFullYear(), endMonth.getMonth() - 11, 1);
+            drawRevenueOverview(adminOrders, 'month', null, start, endMonth);
+        };
+        // default to current month
+        const now = new Date();
+        const defaultVal = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+        inp.value = defaultVal;
+        container.appendChild(inp);
+    } else if (currentRevenueGranularity === 'year') {
+        // use a month input to select a month within the year (native calendar fallback), then show 12 months ending that month
+        const inp = document.createElement('input'); inp.type = 'month'; inp.id = 'rev-single-year-month'; inp.title = 'Chọn năm (mở lịch và chọn bất kỳ tháng trong năm)';
+        inp.onchange = () => {
+            const v = inp.value; if (!v) return;
+            const [y,m] = v.split('-').map(Number);
+            const endMonth = new Date(y, m-1, 1);
+            const start = new Date(endMonth.getFullYear(), endMonth.getMonth() - 11, 1);
+            drawRevenueOverview(adminOrders, 'month', null, start, endMonth);
+        };
+        container.appendChild(inp);
+    }
+}
+
+// Generate some demo orders across months to visualize charts locally
+function generateDemoOrders() {
+    const demo = [];
+    const now = new Date();
+    const idsStart = 100;
+    // create orders for past 6 months and a few other months
+    for (let m = 0; m < 8; m++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - m, Math.min(10 + m, 25));
+        const order = {
+            id: idsStart + m,
+            customerName: 'Demo User ' + (m+1),
+            createdAt: d.toISOString(),
+            status: m % 3 === 0 ? 'CONFIRMED' : 'DELIVERED',
+            totalAmount: 50000 + (m * 45000),
+            items: [{ name: 'Táo', quantity: 1, price: 30000 }, { name: 'Cam', quantity: 2, price: 10000 }]
+        };
+        demo.push(order);
+    }
+    // some older months
+    for (let m = 4; m < 12; m += 3) {
+        const d = new Date(now.getFullYear(), now.getMonth() - m - 2, 15);
+        demo.push({ id: idsStart + 50 + m, customerName: 'DemoUser', createdAt: d.toISOString(), status: 'DELIVERED', totalAmount: 120000 + (m*10000), items: [{name:'Xoài', quantity:2, price:60000}] });
+    }
+    return demo;
+}
+
+function applyRevenueDateRange() {
+    // read controls and compute labels/data accordingly
+    if (currentRevenueGranularity === 'day') {
+        const s = document.getElementById('rev-start-date')?.value;
+        const e = document.getElementById('rev-end-date')?.value;
+        if (!s || !e) { alert('Vui lòng chọn ngày bắt đầu và kết thúc'); return; }
+        const start = new Date(s); const end = new Date(e);
+        if (start > end) { alert('Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc'); return; }
+        // compute days length
+        const diff = Math.ceil((end - start) / (24*3600*1000)) + 1;
+        drawRevenueOverview(adminOrders, 'day', diff, start, end);
+    } else if (currentRevenueGranularity === 'month') {
+        const s = document.getElementById('rev-start-month')?.value;
+        const e = document.getElementById('rev-end-month')?.value;
+        if (!s || !e) { alert('Vui lòng chọn tháng bắt đầu và kết thúc'); return; }
+        // month inputs like YYYY-MM
+        const [ys, ms] = s.split('-').map(Number);
+        const [ye, me] = e.split('-').map(Number);
+        const start = new Date(ys, ms-1, 1);
+        const end = new Date(ye, me-1, 1);
+        if (start > end) { alert('Tháng bắt đầu phải nhỏ hơn hoặc bằng tháng kết thúc'); return; }
+        const monthsDiff = (end.getFullYear() - start.getFullYear())*12 + (end.getMonth() - start.getMonth()) + 1;
+        drawRevenueOverview(adminOrders, 'month', monthsDiff, start, end);
+    } else if (currentRevenueGranularity === 'year') {
+        const ys = parseInt(document.getElementById('rev-start-year')?.value,10);
+        const ye = parseInt(document.getElementById('rev-end-year')?.value,10);
+        if (!ys || !ye) { alert('Vui lòng nhập năm bắt đầu và kết thúc'); return; }
+        if (ys > ye) { alert('Năm bắt đầu phải nhỏ hơn hoặc bằng năm kết thúc'); return; }
+        const years = ye - ys + 1;
+        const start = new Date(ys,0,1); const end = new Date(ye,11,31);
+        drawRevenueOverview(adminOrders, 'year', years, start, end);
+    }
 }
 
 // ---- Biểu đồ donut trạng thái đơn ----
@@ -787,11 +1009,11 @@ function renderRecentOrders(orders) {
     if (!container) return;
 
     const statusLabel = {
-        PROCESSING: 'Chờ xử lý', CONFIRMED: 'Xác nhận',
+        PENDING: 'Chờ xử lý', CONFIRMED: 'Xác nhận',
         SHIPPED: 'Đang giao', DELIVERED: 'Đã giao', CANCELLED: 'Hủy'
     };
     const statusClass = {
-       PROCESSING: 'badge-warning', CONFIRMED: 'badge-success',
+        PENDING: 'badge-warning', CONFIRMED: 'badge-success',
         SHIPPED: 'badge-warning', DELIVERED: 'badge-success', CANCELLED: 'badge-danger'
     };
 

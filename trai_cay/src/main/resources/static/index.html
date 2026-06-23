@@ -10,299 +10,299 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script></head>
 <body>
 
-    <!-- Header -->
+<!-- Header -->
 
-    <div class="header-wrapper">
-        <header class="header">
-            <div class="header-left">
-                <div class="logo">
-                    <i class="fas fa-leaf"></i>
-                    <div class="logo-text">
-                        <span>Fresh Fruit</span>
-                        <small>Trang chủ & Cửa hàng</small>
-                    </div>
+<div class="header-wrapper">
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <div class="logo-text">
+                    <span>Fresh Fruit</span>
+                    <small>Trang chủ & Cửa hàng</small>
                 </div>
             </div>
-            <div class="header-center">
-                <form class="search-bar" action="#" onsubmit="event.preventDefault(); executeSearch();">
-                    <i class="fas fa-search outline-icon search-icon" style="cursor: pointer;" onclick="executeSearch()"></i>
+        </div>
+        <div class="header-center">
+            <form class="search-bar" action="#" onsubmit="event.preventDefault(); executeSearch();">
+                <i class="fas fa-search outline-icon search-icon" style="cursor: pointer;" onclick="executeSearch()"></i>
 
-                    <input id="home-search-input" type="text" placeholder="Tìm kiếm sản phẩm...">
-                </form>
+                <input id="home-search-input" type="text" placeholder="Tìm kiếm sản phẩm...">
+            </form>
+        </div>
+        <div class="header-right">
+            <div class="icon-button cart-icon" onclick="navigateTo('cart')">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="badge" id="cart-badge">0</span>
             </div>
-            <div class="header-right">
-                <div class="icon-button cart-icon" onclick="navigateTo('cart')">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="badge" id="cart-badge">0</span>
-                </div>
 
-                <div class="icon-button user-icon" id="user-avatar-btn" onclick="handleUserIconClick()">
-                    <i class="far fa-user" id="user-icon-default"></i>
-                    <img id="user-avatar-img" src="" alt="Avatar" style="display:none;">
-                    <span class="icon-text" id="user-text-default">Đăng nhập</span>
-                </div>
+            <div class="icon-button user-icon" id="user-avatar-btn" onclick="handleUserIconClick()">
+                <i class="far fa-user" id="user-icon-default"></i>
+                <img id="user-avatar-img" src="" alt="Avatar" style="display:none;">
+                <span class="icon-text" id="user-text-default">Đăng nhập</span>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- Navigation -->
-        <nav class="navigation">
-            <ul>
-                <li><a href="#" class="nav-link active" data-page="home">Trang chủ</a></li>
+    <!-- Navigation -->
+    <nav class="navigation">
+        <ul>
+            <li><a href="#" class="nav-link active" data-page="home">Trang chủ</a></li>
 
-                <li><a href="#" class="nav-link" data-page="about">Giới thiệu</a></li>
+            <li><a href="#" class="nav-link" data-page="about">Giới thiệu</a></li>
 
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link" data-page="products">
-                        Sản phẩm <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 4px;"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#" onclick="filterByMenu('Việt Nam')">Trái cây Việt Nam</a></li>
-                        <li><a href="#" onclick="filterByMenu('Trái cây nhập khẩu')">Trái cây nhập khẩu</a></li>
-                        <li><a href="#" onclick="filterByMenu('Táo')">Táo</a></li>
-                        <li><a href="#" onclick="filterByMenu('Quả mọng')">Quả mọng</a></li>
-                        <li><a href="#" onclick="filterByMenu('Khác')">Trái cây theo mùa</a></li>
-                    </ul>
-                </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link" data-page="products">
+                    Sản phẩm <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 4px;"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" onclick="filterByMenu('Việt Nam')">Trái cây Việt Nam</a></li>
+                    <li><a href="#" onclick="filterByMenu('Trái cây nhập khẩu')">Trái cây nhập khẩu</a></li>
+                    <li><a href="#" onclick="filterByMenu('Táo')">Táo</a></li>
+                    <li><a href="#" onclick="filterByMenu('Quả mọng')">Quả mọng</a></li>
+                    <li><a href="#" onclick="filterByMenu('Khác')">Trái cây theo mùa</a></li>
+                </ul>
+            </li>
 
-                <li><a href="#" class="nav-link" data-page="news">Mùa vụ/Tin tức</a></li>
+            <li><a href="#" class="nav-link" data-page="news">Mùa vụ/Tin tức</a></li>
 
-                <li><a href="#" class="nav-link" id="profile-link" data-page="profile" style="display: none;">Hồ sơ</a></li>
-                <li id="checkout-nav-item" style="display: none;">
-                    <a href="#" class="nav-link" data-page="checkout">Thanh toán</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+            <li><a href="#" class="nav-link" id="profile-link" data-page="profile" style="display: none;">Hồ sơ</a></li>
+            <li id="checkout-nav-item" style="display: none;">
+                <a href="#" class="nav-link" data-page="checkout">Thanh toán</a>
+            </li>
+        </ul>
+    </nav>
+</div>
 
-    <div class="container">
+<div class="container">
     <!-- Main Content -->
     <main class="main-content">
         <!-- Home Page -->
         <!-- Banner Slider -->
-<section id="home" class="page-section active">
-    <section class="banner-slider">
-        <div class="slider-container">
-            
-            <div class="slides-wrapper">
-                <div class="slide active">
-                    <img src="assets/images/banner1.png" alt="Banner 1">
-                </div>
-                <div class="slide">
-                    <img src="assets/images/banner2.png" alt="Banner 2">
-                </div>
-                <div class="slide">
-                    <img src="assets/images/banner3.png" alt="Banner 3">
-                </div>
-            </div>
+        <section id="home" class="page-section active">
+            <section class="banner-slider">
+                <div class="slider-container">
 
-            <!-- Nút điều hướng -->
-            <button class="prev-btn" onclick="changeSlide(-1)">&#10094;</button>
-            <button class="next-btn" onclick="changeSlide(1)">&#10095;</button>
-
-            <!-- Dots -->
-            <div class="dots-container">
-                <span class="dot active" onclick="currentSlide(0)"></span>
-                <span class="dot" onclick="currentSlide(1)"></span>
-                <span class="dot" onclick="currentSlide(2)"></span> 
-            </div>
-        </div>
-
-    </section>
-    <div class="featured-products">
-        <div class="featured-header-row">
-            <div class="featured-title">
-                <h2>Sản Phẩm Nổi Bật</h2>
-            </div>
-        </div>
-
-        <!-- Wrapper bọc cả nút + grid -->
-        <div class="featured-slider-outer">
-            <button class="featured-nav-btn" id="featured-prev" onclick="slideFeatured(-1)">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-
-            <div class="featured-slider-wrapper">
-                <div class="product-grid" id="home-product-grid"></div>
-            </div>
-
-            <button class="featured-nav-btn" id="featured-next" onclick="slideFeatured(1)">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
-
-        <!-- ===== TRÁI CÂY VIỆT NAM ===== -->
-        <div class="home-category-section">
-            <div class="category-header">
-                <h2>Trái Cây Việt Nam</h2>
-            </div>
-            <div class="featured-slider-outer">
-                <button class="featured-nav-btn" onclick="slideCategory('vn', -1)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="featured-slider-wrapper">
-                    <div class="product-grid" id="vn-product-grid"></div>
-                </div>
-                <button class="featured-nav-btn" onclick="slideCategory('vn', 1)">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- ===== TRÁI CÂY NƯỚC NGOÀI ===== -->
-        <div class="home-category-section">
-            <div class="category-header">
-                <h2>Trái Cây Nhập Khẩu</h2>
-            </div>
-            <div class="featured-slider-outer">
-                <button class="featured-nav-btn" onclick="slideCategory('foreign', -1)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="featured-slider-wrapper">
-                    <div class="product-grid" id="foreign-product-grid"></div>
-                </div>
-                <button class="featured-nav-btn" onclick="slideCategory('foreign', 1)">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- ===== GIỚI THIỆU FRESH FRUIT ===== -->
-        <div class="home-intro-section">
-            <div class="home-intro-header">
-                <h2>Về Fresh Fruit</h2>
-                <p class="home-intro-sub">Cam kết mang đến trái cây tươi ngon nhất mỗi ngày</p>
-            </div>
-            <div class="home-intro-grid">
-                <div class="home-intro-text">
-                    <p>Fresh Fruit được thành lập với niềm đam mê mang đến những loại trái cây tươi ngon nhất cho người Việt. Với hơn 10 năm kinh nghiệm, chúng tôi tự hào phục vụ hàng nghìn khách hàng mỗi ngày.</p>
-                    <p>Tất cả sản phẩm đều đạt chứng nhận <strong>GlobalGAP</strong>, được kiểm soát chất lượng nghiêm ngặt từ nhà vườn đến tay người tiêu dùng.</p>
-                    <a href="#" onclick="navigateTo('about')" class="btn-intro-more">Tìm hiểu thêm</a>
-                </div>
-                <div class="home-intro-stats">
-                    <div class="stat-card">
-                        <i class="fas fa-store"></i>
-                        <span class="stat-number">500+</span>
-                        <span class="stat-label">Sản phẩm</span>
+                    <div class="slides-wrapper">
+                        <div class="slide active">
+                            <img src="assets/images/banner1.png" alt="Banner 1">
+                        </div>
+                        <div class="slide">
+                            <img src="assets/images/banner2.png" alt="Banner 2">
+                        </div>
+                        <div class="slide">
+                            <img src="assets/images/banner3.png" alt="Banner 3">
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <i class="fas fa-users"></i>
-                        <span class="stat-number">10.000+</span>
-                        <span class="stat-label">Khách hàng</span>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-globe"></i>
-                        <span class="stat-number">20+</span>
-                        <span class="stat-label">Quốc gia</span>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-award"></i>
-                        <span class="stat-number">10+</span>
-                        <span class="stat-label">Năm kinh nghiệm</span>
+
+                    <!-- Nút điều hướng -->
+                    <button class="prev-btn" onclick="changeSlide(-1)">&#10094;</button>
+                    <button class="next-btn" onclick="changeSlide(1)">&#10095;</button>
+
+                    <!-- Dots -->
+                    <div class="dots-container">
+                        <span class="dot active" onclick="currentSlide(0)"></span>
+                        <span class="dot" onclick="currentSlide(1)"></span>
+                        <span class="dot" onclick="currentSlide(2)"></span>
                     </div>
                 </div>
+
+            </section>
+            <div class="featured-products">
+                <div class="featured-header-row">
+                    <div class="featured-title">
+                        <h2>Sản Phẩm Nổi Bật</h2>
+                    </div>
+                </div>
+
+                <!-- Wrapper bọc cả nút + grid -->
+                <div class="featured-slider-outer">
+                    <button class="featured-nav-btn" id="featured-prev" onclick="slideFeatured(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <div class="featured-slider-wrapper">
+                        <div class="product-grid" id="home-product-grid"></div>
+                    </div>
+
+                    <button class="featured-nav-btn" id="featured-next" onclick="slideFeatured(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
             </div>
-            <div class="home-awards">
-                <div class="award-item">
-                    <i class="fas fa-certificate"></i>
-                    <span>Chứng nhận GlobalGAP</span>
+
+            <!-- ===== TRÁI CÂY VIỆT NAM ===== -->
+            <div class="home-category-section">
+                <div class="category-header">
+                    <h2>Trái Cây Việt Nam</h2>
                 </div>
-                <div class="award-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Vệ sinh an toàn thực phẩm</span>
-                </div>
-                <div class="award-item">
-                    <i class="fas fa-truck"></i>
-                    <span>Giao hàng nhanh 2-4h</span>
-                </div>
-                <div class="award-item">
-                    <i class="fas fa-undo"></i>
-                    <span>Đổi trả trong 24h</span>
+                <div class="featured-slider-outer">
+                    <button class="featured-nav-btn" onclick="slideCategory('vn', -1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="featured-slider-wrapper">
+                        <div class="product-grid" id="vn-product-grid"></div>
+                    </div>
+                    <button class="featured-nav-btn" onclick="slideCategory('vn', 1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
                 </div>
             </div>
-        </div>
 
-    <section class="why-us-section">
-        <div class="why-left">
-            <h2>
-                Tại sao bạn lựa chọn chúng tôi
-            </h2>
+            <!-- ===== TRÁI CÂY NƯỚC NGOÀI ===== -->
+            <div class="home-category-section">
+                <div class="category-header">
+                    <h2>Trái Cây Nhập Khẩu</h2>
+                </div>
+                <div class="featured-slider-outer">
+                    <button class="featured-nav-btn" onclick="slideCategory('foreign', -1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="featured-slider-wrapper">
+                        <div class="product-grid" id="foreign-product-grid"></div>
+                    </div>
+                    <button class="featured-nav-btn" onclick="slideCategory('foreign', 1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
 
-            <p class="why-desc">
-                Fresh Fruit cung cấp đa dạng trái cây trong nước và nhập khẩu,
-                đảm bảo chất lượng, nguồn gốc rõ ràng và mang đến trải nghiệm
-                tốt nhất cho khách hàng.
-            </p>
-
-            <ul class="why-list">
-                <li>Tận tâm với khách hàng và người tiêu dùng</li>
-                <li>Hệ thống cửa hàng trên toàn quốc</li>
-                <li>Quy trình sản phẩm đạt chuẩn chất lượng</li>
-                <li>Công nghệ bảo quản hiện đại</li>
-            </ul>
-        </div>
-
-        <div class="why-right">
-            <img
-                    src="https://img1.kienthucvui.vn/uploads/2021/12/23/hinh-anh-trai-cay-cac-loai_094110718.jpg"
-                    alt="Fresh Fruit">
-
-            <div class="testimonial-box">
-
-                <div class="testimonial-content active">
-                    <p>
-                        "Trái cây tại Fresh Fruit luôn tươi ngon,
-                        nguồn gốc rõ ràng và dịch vụ rất tận tâm."
-                    </p>
-
-                    <div class="testimonial-user">
-                        <img src="https://cdn.mosflyvn.com/upload/mosflyvn_com/post/images/2024/04/29/408/meme-huan-hoa-hong-10-diem-2.jpg">
-                        <div>
-                            <h4>Huấn Hoa Hồng</h4>
-                            <span>Khách hàng thân thiết</span>
+            <!-- ===== GIỚI THIỆU FRESH FRUIT ===== -->
+            <div class="home-intro-section">
+                <div class="home-intro-header">
+                    <h2>Về Fresh Fruit</h2>
+                    <p class="home-intro-sub">Cam kết mang đến trái cây tươi ngon nhất mỗi ngày</p>
+                </div>
+                <div class="home-intro-grid">
+                    <div class="home-intro-text">
+                        <p>Fresh Fruit được thành lập với niềm đam mê mang đến những loại trái cây tươi ngon nhất cho người Việt. Với hơn 10 năm kinh nghiệm, chúng tôi tự hào phục vụ hàng nghìn khách hàng mỗi ngày.</p>
+                        <p>Tất cả sản phẩm đều đạt chứng nhận <strong>GlobalGAP</strong>, được kiểm soát chất lượng nghiêm ngặt từ nhà vườn đến tay người tiêu dùng.</p>
+                        <a href="#" onclick="navigateTo('about')" class="btn-intro-more">Tìm hiểu thêm</a>
+                    </div>
+                    <div class="home-intro-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-store"></i>
+                            <span class="stat-number">500+</span>
+                            <span class="stat-label">Sản phẩm</span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <span class="stat-number">10.000+</span>
+                            <span class="stat-label">Khách hàng</span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-globe"></i>
+                            <span class="stat-number">20+</span>
+                            <span class="stat-label">Quốc gia</span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-award"></i>
+                            <span class="stat-number">10+</span>
+                            <span class="stat-label">Năm kinh nghiệm</span>
                         </div>
                     </div>
                 </div>
-
-                <div class="testimonial-content">
-                    <p>
-                        "Tôi rất yên tâm khi mua trái cây tại Fresh Fruit,
-                        sản phẩm chất lượng và rất sạch sẽ."
-                    </p>
-
-                    <div class="testimonial-user">
-                        <img src="https://tse2.mm.bing.net/th/id/OIP.qoMRLMUa449l3EjGRKEWTAHaJ4?pid=Api&P=0&h=180">
-                        <div>
-                            <h4>Trường Con</h4>
-                            <span>Nhân viên văn phòng</span>
-                        </div>
+                <div class="home-awards">
+                    <div class="award-item">
+                        <i class="fas fa-certificate"></i>
+                        <span>Chứng nhận GlobalGAP</span>
+                    </div>
+                    <div class="award-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Vệ sinh an toàn thực phẩm</span>
+                    </div>
+                    <div class="award-item">
+                        <i class="fas fa-truck"></i>
+                        <span>Giao hàng nhanh 2-4h</span>
+                    </div>
+                    <div class="award-item">
+                        <i class="fas fa-undo"></i>
+                        <span>Đổi trả trong 24h</span>
                     </div>
                 </div>
-
-                <div class="testimonial-content">
-                    <p>
-                        "Gia đình tôi đã sử dụng sản phẩm của Fresh Fruit
-                        nhiều năm và luôn hài lòng về chất lượng."
-                    </p>
-
-                    <div class="testimonial-user">
-                        <img src="https://cdn.tech24.vn/upload/tech24_vn/post/images/2024/06/17/557/kha-banh-meme-3.jpg">
-                        <div>
-                            <h4>Lê Bá Khá</h4>
-                            <span>Khách hàng VIP</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-dots">
-                    <span class="t-dot active"></span>
-                    <span class="t-dot"></span>
-                    <span class="t-dot"></span>
-                </div>
-
             </div>
-        </div>
-    </section>
+
+            <section class="why-us-section">
+                <div class="why-left">
+                    <h2>
+                        Tại sao bạn lựa chọn chúng tôi
+                    </h2>
+
+                    <p class="why-desc">
+                        Fresh Fruit cung cấp đa dạng trái cây trong nước và nhập khẩu,
+                        đảm bảo chất lượng, nguồn gốc rõ ràng và mang đến trải nghiệm
+                        tốt nhất cho khách hàng.
+                    </p>
+
+                    <ul class="why-list">
+                        <li>Tận tâm với khách hàng và người tiêu dùng</li>
+                        <li>Hệ thống cửa hàng trên toàn quốc</li>
+                        <li>Quy trình sản phẩm đạt chuẩn chất lượng</li>
+                        <li>Công nghệ bảo quản hiện đại</li>
+                    </ul>
+                </div>
+
+                <div class="why-right">
+                    <img
+                            src="https://img1.kienthucvui.vn/uploads/2021/12/23/hinh-anh-trai-cay-cac-loai_094110718.jpg"
+                            alt="Fresh Fruit">
+
+                    <div class="testimonial-box">
+
+                        <div class="testimonial-content active">
+                            <p>
+                                "Trái cây tại Fresh Fruit luôn tươi ngon,
+                                nguồn gốc rõ ràng và dịch vụ rất tận tâm."
+                            </p>
+
+                            <div class="testimonial-user">
+                                <img src="https://cdn.mosflyvn.com/upload/mosflyvn_com/post/images/2024/04/29/408/meme-huan-hoa-hong-10-diem-2.jpg">
+                                <div>
+                                    <h4>Huấn Hoa Hồng</h4>
+                                    <span>Khách hàng thân thiết</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-content">
+                            <p>
+                                "Tôi rất yên tâm khi mua trái cây tại Fresh Fruit,
+                                sản phẩm chất lượng và rất sạch sẽ."
+                            </p>
+
+                            <div class="testimonial-user">
+                                <img src="https://tse2.mm.bing.net/th/id/OIP.qoMRLMUa449l3EjGRKEWTAHaJ4?pid=Api&P=0&h=180">
+                                <div>
+                                    <h4>Trường Con</h4>
+                                    <span>Nhân viên văn phòng</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-content">
+                            <p>
+                                "Gia đình tôi đã sử dụng sản phẩm của Fresh Fruit
+                                nhiều năm và luôn hài lòng về chất lượng."
+                            </p>
+
+                            <div class="testimonial-user">
+                                <img src="https://cdn.tech24.vn/upload/tech24_vn/post/images/2024/06/17/557/kha-banh-meme-3.jpg">
+                                <div>
+                                    <h4>Lê Bá Khá</h4>
+                                    <span>Khách hàng VIP</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-dots">
+                            <span class="t-dot active"></span>
+                            <span class="t-dot"></span>
+                            <span class="t-dot"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
         </section>
 
 
@@ -424,9 +424,9 @@
                     </div>
                     <div class="product-main-area" style="width: 100%;">
                         <h2>Sản Phẩm</h2>
-                    <div class="product-grid" id="product-list-container">
+                        <div class="product-grid" id="product-list-container">
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
         </section>
@@ -475,67 +475,73 @@
             </div>
         </section>
 
-        <!-- Cart Page -->
         <section id="cart" class="page-section">
-            <div class="cart-section">
-                <h1>Giỏ Hàng Của Bạn</h1>
-                <div class="cart-container">
-                    <div class="cart-table">
-                        <table>
+            <div class="cart-wrapper">
+                <h1 style="text-align:center; margin-bottom:30px; color:#4A7C2C;">Giỏ Hàng Của Bạn</h1>
+
+                <div class="cart-container-modern">
+
+                    <!-- Cột trái: Danh sách sản phẩm -->
+                    <div class="cart-left">
+                        <table class="cart-table">
                             <thead>
                             <tr>
-                                <th>Sản phẩm</th>
-                                <th>Giá</th>
-                                <th>Số lượng</th>
-                                <th>Thành tiền</th>
+                                <th>SẢN PHẨM</th>
+                                <th>GIÁ</th>
+                                <th>SỐ LƯỢNG</th>
+                                <th>TẠM TÍNH</th>
                                 <th></th>
                             </tr>
                             </thead>
-                            <tbody id="cart-items">
-                            <tr>
-                                <td colspan="5" class="empty-cart">Giỏ hàng trống</td>
-                            </tr>
-                            </tbody>
+                            <tbody id="cart-items"></tbody>
                         </table>
+
+                        <div class="cart-actions">
+                            <button class="btn-outline" onclick="navigateTo('products')">← Tiếp tục mua sắm</button>
+                        </div>
                     </div>
-                    <div class="cart-summary">
-                        <h3>Tổng quan đơn hàng</h3>
-                        <div class="summary-item">
-                            <label>Mã giảm giá:</label>
-                            <div class="coupon-input">
-                                <input type="text" placeholder="Nhập mã giảm giá">
-                                <button class="btn-apply">Áp dụng</button>
+
+                    <!-- Cột phải: Tóm tắt đơn hàng -->
+                    <div class="cart-right">
+                        <div class="cart-summary-card">
+                            <h3>TỔNG CỘNG GIỎ HÀNG</h3>
+
+                            <div class="summary-line">
+                                <span>Tạm tính</span>
+                                <strong id="subtotal">0đ</strong>
+                            </div>
+
+                            <div class="summary-line total-line">
+                                <span>Tổng</span>
+                                <strong id="total">0đ</strong>
+                            </div>
+
+                            <button class="btn-checkout-primary" onclick="navigateTo('checkout')">
+                                TIẾN HÀNH THANH TOÁN
+                            </button>
+
+                            <!-- Mã ưu đãi -->
+                            <div style="margin-top:20px;">
+                                <div style="font-weight:500; margin-bottom:8px;">Mã ưu đãi</div>
+                                <div class="coupon-input">
+                                    <input type="text" id="cart-coupon" placeholder="Nhập mã giảm giá">
+                                    <button class="btn-apply" onclick="applyCoupon()">Áp dụng</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="summary-item">
-                            <label>Tạm tính:</label>
-                            <span id="subtotal">0đ</span>
-                        </div>
-                        <div class="summary-item">
-                            <label>Phí vận chuyển:</label>
-                            <span>Miễn phí</span>
-                        </div>
-                        <div class="summary-item total">
-                            <label>Tổng cộng:</label>
-                            <span id="total">0đ</span>
-                        </div>
-                        <button class="btn-checkout" onclick="navigateTo('checkout')">Tiến hành thanh toán</button>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="checkout" class="page-section">
-            <div class="checkout-section">
-                <h1>Thanh Toán</h1>
-
-                <!-- Thanh tiến trình -->
+            <div class="checkout-wrapper">
                 <div class="checkout-steps">
                     <div class="step active">
                         <div class="step-icon"><i class="fas fa-shopping-cart"></i></div>
                         <span>Giỏ hàng</span>
                     </div>
-                    <div class="step-line"></div>
+                    <div class="step-line active"></div>
                     <div class="step active">
                         <div class="step-icon"><i class="fas fa-map-marker-alt"></i></div>
                         <span>Giao hàng</span>
@@ -547,102 +553,76 @@
                     </div>
                 </div>
 
-                <div class="checkout-container">
-                    <!-- CỘT TRÁI: Thông tin giao hàng + Phương thức thanh toán -->
-                    <div class="checkout-left">
+                <div class="checkout-container-modern">
 
-                        <!-- Thông tin giao hàng -->
+                    <div class="checkout-left">
                         <div class="checkout-card">
                             <div class="checkout-card-header">
-                                <i class="fas fa-map-marker-alt"></i>
+                                <i class="fas fa-user-edit"></i>
                                 <h3>Thông tin giao hàng</h3>
                             </div>
-                            <form id="order-form">
-                                <div class="form-row-2">
-                                    <div class="form-group">
-                                        <label>Họ và tên <span class="required">*</span></label>
-                                        <div class="input-icon-wrap">
-                                            <i class="fas fa-user"></i>
-                                            <input type="text" id="fullname" placeholder="Nguyễn Văn A" required>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Số điện thoại <span class="required">*</span></label>
-                                        <div class="input-icon-wrap">
-                                            <i class="fas fa-phone"></i>
-                                            <input type="tel" id="phone" placeholder="0912 345 678" required>
-                                        </div>
-                                    </div>
+
+                            <form id="order-form" class="checkout-form">
+                                <div class="form-group">
+                                    <label for="fullname">Họ và tên <span class="required">*</span></label>
+                                    <input type="text" id="fullname" placeholder="Nhập họ và tên đầy đủ" required>
                                 </div>
                                 <div class="form-group">
-                                    <label>Địa chỉ giao hàng <span class="required">*</span></label>
-                                    <div class="input-icon-wrap">
-                                        <i class="fas fa-home"></i>
-                                        <input type="text" id="address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố" required>
-                                    </div>
+                                    <label for="phone">Số điện thoại <span class="required">*</span></label>
+                                    <input type="tel" id="phone" placeholder="Nhập số điện thoại nhận hàng" required>
                                 </div>
                                 <div class="form-group">
-                                    <label>Ghi chú đơn hàng</label>
-                                    <textarea id="notes" rows="3" placeholder="Ghi chú thêm (giao giờ nào, cổng nào,...)"></textarea>
+                                    <label for="address">Địa chỉ giao hàng <span class="required">*</span></label>
+                                    <input type="text" id="address" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="notes">Ghi chú đơn hàng</label>
+                                    <textarea id="notes" rows="4" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao 15 phút..."></textarea>
                                 </div>
                             </form>
                         </div>
 
-                        <!-- Phương thức thanh toán -->
                         <div class="checkout-card">
                             <div class="checkout-card-header">
                                 <i class="fas fa-credit-card"></i>
                                 <h3>Phương thức thanh toán</h3>
                             </div>
-
-                            <div class="payment-options">
-                                <!-- COD -->
-                                <label class="payment-option" id="opt-cod">
-                                    <input type="radio"
-                                           name="payment"
-                                           value="COD"
-                                           checked>
-                                    <div class="payment-option-content">
-                                        <div class="payment-icon cod-icon">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                        </div>
-                                        <div class="payment-info">
-                                            <strong>Thanh toán khi nhận hàng (COD)</strong>
-                                            <span>Trả tiền mặt khi nhận hàng tại nhà</span>
-                                        </div>
-                                        <div class="payment-check"><i class="fas fa-check-circle"></i></div>
+                            <label class="payment-option active">
+                                <input type="radio" name="payment" value="cod" checked>
+                                <div class="payment-option-content">
+                                    <div class="payment-icon cod-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                    <div class="payment-info">
+                                        <strong>Thanh toán khi nhận hàng (COD)</strong>
+                                        <span>Thanh toán bằng tiền mặt khi shipper giao tới hàng</span>
                                     </div>
-                                </label>
-                            </div>
+                                </div>
+                            </label>
                         </div>
                     </div>
 
-                    <!-- CỘT PHẢI: Tóm tắt đơn hàng -->
                     <div class="checkout-right">
                         <div class="checkout-card order-summary-card">
                             <div class="checkout-card-header">
-                                <i class="fas fa-shopping-bag"></i>
+                                <i class="fas fa-shopping-basket"></i>
                                 <h3>Đơn hàng của bạn</h3>
                             </div>
 
                             <div class="order-items" id="checkout-items">
-                                <p class="empty-cart">Không có sản phẩm</p>
                             </div>
 
-                            <!-- Mã giảm giá -->
                             <div class="coupon-row">
-                                <input type="text" id="checkout-coupon" placeholder="Nhập mã giảm giá">
-                                <button class="btn-apply-coupon" onclick="applyCoupon()">Áp dụng</button>
+                                <input type="text" id="checkout-coupon" placeholder="Nhập mã giảm giá (nếu có)">
+                                <button type="button" class="btn-apply-coupon" onclick="applyCoupon()">Áp dụng</button>
                             </div>
 
                             <div class="order-totals">
                                 <div class="total-row">
                                     <span>Tạm tính</span>
-                                    <span id="checkout-subtotal">0đ</span>
+                                    <span id="checkout-subtotal" class="price-value">0đ</span>
                                 </div>
                                 <div class="total-row">
                                     <span>Phí vận chuyển</span>
-                                    <span class="free-ship"><i class="fas fa-truck"></i> Miễn phí</span>
+                                    <span class="free-ship"><i class="fas fa-truck text-success"></i> Miễn phí</span>
                                 </div>
                                 <div class="total-row discount-row" id="discount-row" style="display:none;">
                                     <span>Giảm giá</span>
@@ -654,28 +634,12 @@
                                 </div>
                             </div>
 
-                            <!-- Cam kết -->
-                            <div class="checkout-guarantees">
-                                <div class="guarantee-item">
-                                    <i class="fas fa-shield-alt"></i>
-                                    <span>Bảo mật thanh toán 100%</span>
-                                </div>
-                                <div class="guarantee-item">
-                                    <i class="fas fa-undo"></i>
-                                    <span>Đổi trả miễn phí 24h</span>
-                                </div>
-                                <div class="guarantee-item">
-                                    <i class="fas fa-leaf"></i>
-                                    <span>Hàng tươi đảm bảo</span>
-                                </div>
-                            </div>
-
-                            <button class="btn-place-order" onclick="placeOrder()">
-                                <i class="fas fa-check-circle"></i>
-                                Đặt hàng ngay
+                            <button type="button" class="btn-place-order" onclick="placeOrder()">
+                                <i class="fas fa-shield-alt"></i>  ĐẶT HÀNG
                             </button>
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>
@@ -767,46 +731,70 @@
         <!-- Order Confirmation Page -->
         <section id="order-confirmation" class="page-section">
             <div class="confirmation-section">
-                <div class="confirmation-container">
-                    <div class="confirmation-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h1>Đơn Hàng Được Xác Nhận</h1>
-                    <p class="confirmation-message">Cảm ơn bạn đã đặt hàng!</p>
-                    
-                    <div class="order-info">
-                        <div class="info-box">
-                            <h3>Mã đơn hàng</h3>
-                            <p id="confirm-order-id">#ORD-2026-001</p>
+                <div class="confirmation-card">
+                    <div class="confirmation-top">
+                        <div class="confirmation-icon">
+                            <i class="fas fa-check"></i>
                         </div>
-                        <div class="info-box">
-                            <h3>Tổng tiền</h3>
-                            <p id="confirm-total">0đ</p>
-                        </div>
-                        <div class="info-box">
-                            <h3>Phương thức thanh toán</h3>
-                            <p id="confirm-payment">COD</p>
+                        <div>
+                            <p class="confirmation-label">Đặt hàng thành công</p>
+                            <h1>Đơn hàng của bạn đã được tiếp nhận</h1>
+                            <p class="confirmation-message">Cảm ơn bạn đã mua sắm tại Fresh Fruit. Đơn hàng sẽ được xử lý trong vòng 24 giờ và nhân viên sẽ liên hệ để xác nhận giao hàng.</p>
                         </div>
                     </div>
 
-                    <div class="delivery-info">
-                        <h3>Thông tin giao hàng</h3>
-                        <div class="delivery-details">
-                            <p><strong>Họ tên:</strong> <span id="confirm-name"></span></p>
-                            <p><strong>Số điện thoại:</strong> <span id="confirm-phone"></span></p>
-                            <p><strong>Địa chỉ:</strong> <span id="confirm-address"></span></p>
+                    <div class="confirmation-grid">
+                        <div class="confirmation-summary">
+                            <h2>Chi tiết đơn hàng</h2>
+                            <div class="info-box">
+                                <h3>Mã đơn hàng</h3>
+                                <p id="confirm-order-id">#ORD-2026-001</p>
+                            </div>
+                            <div class="info-box">
+                                <h3>Tổng tiền</h3>
+                                <p id="confirm-total">0đ</p>
+                            </div>
+                            <div class="info-box">
+                                <h3>Trạng thái đơn hàng</h3>
+                                <p id="confirm-status">Chờ xác nhận</p>
+                            </div>
+                            <div class="info-box">
+                                <h3>Phương thức thanh toán</h3>
+                                <p id="confirm-payment">COD</p>
+                            </div>
                         </div>
+
+                        <div class="delivery-card">
+                            <h2>Thông tin giao hàng</h2>
+                            <div class="delivery-details">
+                                <p><strong>Họ tên:</strong> <span id="confirm-name"></span></p>
+                                <p><strong>Số điện thoại:</strong> <span id="confirm-phone"></span></p>
+                                <p><strong>Địa chỉ:</strong> <span id="confirm-address"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-items-card">
+                        <h2>Sản phẩm đã mua</h2>
+                        <div class="order-items-table">
+                            <div class="order-items-header">
+                                <span>Sản phẩm</span>
+                                <span>Số lượng</span>
+                                <span>Đơn giá</span>
+                                <span>Thành tiền</span>
+                            </div>
+                            <div class="order-items-body" id="confirm-order-items"></div>
+                        </div>
+                        <p class="order-date-line">Ngày đặt hàng: <strong id="confirm-date">-</strong></p>
                     </div>
 
                     <div class="confirmation-actions">
                         <button class="btn-primary" onclick="navigateTo('home')">Tiếp tục mua sắm</button>
-                        <button class="btn-secondary" onclick="showLastOrder()">Xem chi tiết đơn hàng</button>
+                        <button class="btn-secondary" onclick="navigateTo('profile')">Xem đơn hàng</button>
                     </div>
                 </div>
             </div>
         </section>
-
-
 
         <section id="login" class="page-section">
             <div class="auth-section">
@@ -1004,94 +992,146 @@
             </div>
         </section>
 
-    <footer class="footer">
-        <div class="footer-column">
-            <h3>Liên hệ</h3>
-            <p><i class="fas fa-phone"></i> 0123456789</p>
-            <p><i class="fas fa-envelope"></i> nhom16@freshfruit.vn</p>
-            <p><i class="fas fa-map-marker-alt"></i> 123 Chiến Thắng, Học Viện Kĩ Thuật Mật Mã</p>
-        </div>
-        <div class="footer-column">
-            <h3>Dịch vụ khách hàng</h3>
-            <ul>
-                <li><a href="#">Chính sách đổi trả 24h</a></li>
-                <li><a href="#">Thông tin vận chuyển</a></li>
-                <li><a href="#">FAQ</a></li>
-                <li><a href="#">Chính sách bảo mật</a></li>
-            </ul>
-        </div>
-        <div class="footer-column">
-            <h3>Chứng nhận</h3>
-            <div class="certification-logo">
-                <img src="https://dangkywebvoibocongthuong.com/wp-content/uploads/2021/11/logo-da-thong-bao-bo-cong-thuong.png" alt="Bộ Công Thương">
-                <p>Bộ Công Thương</p>
+        <footer class="footer">
+            <div class="footer-column">
+                <h3>Liên hệ</h3>
+                <p><i class="fas fa-phone"></i> 0123456789</p>
+                <p><i class="fas fa-envelope"></i> nhom16@freshfruit.vn</p>
+                <p><i class="fas fa-map-marker-alt"></i> 123 Chiến Thắng, Học Viện Kĩ Thuật Mật Mã</p>
             </div>
-        </div>
-    </footer>
-
-    <!-- FAB Chat Button -->
-    <div class="fab-chat">
-        <i class="fas fa-comment"></i>
-    </div>
-
-    <!-- Popup Notification -->
-    <div class="popup-notification" id="popup-notification">
-        <button class="popup-close" onclick="closePopup()"><i class="fas fa-times"></i></button>
-        <div class="popup-content">
-            <img src="https://img5.thuthuatphanmem.vn/uploads/2021/07/09/anh-qua-dau-tay-do_022006130.jpg" alt="Dâu tây">
-            <div class="popup-text">
-                <p>Khách vừa mua: Mai T. tại Hà Nội vừa mua Dâu tây Hàn Quốc - 2kg. Đã xác nhận.</p>
+            <div class="footer-column">
+                <h3>Dịch vụ khách hàng</h3>
+                <ul>
+                    <li><a href="#">Chính sách đổi trả 24h</a></li>
+                    <li><a href="#">Thông tin vận chuyển</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
             </div>
-        </div>
-    </div>
-
-    <div class="quickbuy-modal" id="quickbuy-modal">
-        <div class="quickbuy-overlay" onclick="closeQuickBuy()"></div>
-        <div class="quickbuy-content">
-            <button class="quickbuy-close" onclick="closeQuickBuy()"><i class="fas fa-times"></i></button>
-            <div class="quickbuy-panel">
-                <div class="quickbuy-image">
-                    <img id="quickbuy-image" src="" alt="">
+            <div class="footer-column">
+                <h3>Chứng nhận</h3>
+                <div class="certification-logo">
+                    <img src="https://dangkywebvoibocongthuong.com/wp-content/uploads/2021/11/logo-da-thong-bao-bo-cong-thuong.png" alt="Bộ Công Thương">
+                    <p>Bộ Công Thương</p>
                 </div>
-                <div class="quickbuy-details">
-                    <h3 id="quickbuy-name">Sản phẩm</h3>
-                    <p id="quickbuy-tagline" class="quickbuy-tagline">Mô tả ngắn</p>
-                    <div class="quickbuy-price-row">
-                        <span class="quickbuy-price" id="quickbuy-price"></span>
-                        <span class="quickbuy-old-price" id="quickbuy-old-price"></span>
-                        <span class="quickbuy-discount" id="quickbuy-discount"></span>
+            </div>
+        </footer>
+
+        <!-- FAB Chat Button -->
+        <div class="fab-chat">
+            <i class="fas fa-comment"></i>
+        </div>
+
+        <!-- Popup Notification -->
+        <div class="popup-notification" id="popup-notification">
+            <button class="popup-close" onclick="closePopup()"><i class="fas fa-times"></i></button>
+            <div class="popup-content">
+                <img src="https://img5.thuthuatphanmem.vn/uploads/2021/07/09/anh-qua-dau-tay-do_022006130.jpg" alt="Dâu tây">
+                <div class="popup-text">
+                    <p>Khách vừa mua: Mai T. tại Hà Nội vừa mua Dâu tây Hàn Quốc - 2kg. Đã xác nhận.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quickbuy-modal" id="quickbuy-modal">
+            <div class="quickbuy-overlay" onclick="closeQuickBuy()"></div>
+            <div class="quickbuy-content">
+                <button class="quickbuy-close" onclick="closeQuickBuy()"><i class="fas fa-times"></i></button>
+                <div class="quickbuy-panel">
+                    <div class="quickbuy-image">
+                        <img id="quickbuy-image" src="" alt="">
                     </div>
-                    <p id="quickbuy-description" class="quickbuy-description"></p>
-                    <ul class="quickbuy-features">
-                        <li id="quickbuy-origin"></li>
-                        <li id="quickbuy-weight"></li>
-                        <li id="quickbuy-category"></li>
-                    </ul>
-                    <div class="quickbuy-actions">
-                        <div class="quantity-control quickbuy-quantity">
-                            <button type="button" onclick="changeQuickBuyQuantity(-1)">-</button>
-                            <input type="number" id="quickbuy-quantity" value="1" min="1">
-                            <button type="button" onclick="changeQuickBuyQuantity(1)">+</button>
+                    <div class="quickbuy-details">
+                        <h3 id="quickbuy-name">Sản phẩm</h3>
+                        <p id="quickbuy-tagline" class="quickbuy-tagline">Mô tả ngắn</p>
+                        <div class="quickbuy-price-row">
+                            <span class="quickbuy-price" id="quickbuy-price"></span>
+                            <span class="quickbuy-old-price" id="quickbuy-old-price"></span>
+                            <span class="quickbuy-discount" id="quickbuy-discount"></span>
                         </div>
-                        <button class="btn-primary quickbuy-add" onclick="quickBuyAddToCart()">Thêm vào giỏ</button>
+                        <p id="quickbuy-description" class="quickbuy-description"></p>
+                        <ul class="quickbuy-features">
+                            <li id="quickbuy-origin"></li>
+                            <li id="quickbuy-weight"></li>
+                            <li id="quickbuy-category"></li>
+                        </ul>
+                        <div class="quickbuy-actions">
+                            <div class="quantity-control quickbuy-quantity">
+                                <button type="button" onclick="changeQuickBuyQuantity(-1)">-</button>
+                                <input type="number" id="quickbuy-quantity" value="1" min="1">
+                                <button type="button" onclick="changeQuickBuyQuantity(1)">+</button>
+                            </div>
+                            <button class="btn-primary quickbuy-add" onclick="quickBuyAddToCart()">Thêm vào giỏ</button>
+                                    </div>
+                                        </div>
+
+                                        </div>
+
+
+
+
+            </div>
+        </div>
+
+        <div class="order-success-overlay" id="order-success-overlay" onclick="closeOrderSuccessModal()"></div>
+        <div class="order-success-modal" id="order-success-modal">
+            <div class="order-success-content">
+                <div class="modal-icon"><i class="fas fa-check-circle"></i></div>
+                <h2>Đặt hàng thành công!</h2>
+                <p class="modal-message">Cảm ơn bạn đã mua sắm tại Fresh Fruit. Đơn hàng của bạn đã được tiếp nhận và sẽ được xử lý sớm nhất.</p>
+                <div class="modal-summary">
+                    <div class="modal-summary-row">
+                        <span>Mã đơn hàng</span>
+                        <strong id="modal-order-id">#---</strong>
                     </div>
+                    <div class="modal-summary-row">
+                        <span>Trạng thái</span>
+                        <strong id="modal-order-status">Chờ xác nhận</strong>
+                    </div>
+                    <div class="modal-summary-row">
+                        <span>Tổng tiền</span>
+                        <strong id="modal-order-total">0đ</strong>
+                    </div>
+                    <div class="modal-summary-row">
+                        <span>Phương thức</span>
+                        <strong id="modal-payment-method">COD</strong>
+                    </div>
+                    <div class="modal-summary-row">
+                        <span>Ngày đặt</span>
+                        <strong id="modal-order-date">-</strong>
+                    </div>
+                    <div class="modal-summary-row">
+                        <span>Khách hàng</span>
+                        <strong id="modal-customer-name">-</strong>
+                    </div>
+                    <div class="modal-summary-row">
+                        <span>Điện thoại</span>
+                        <strong id="modal-customer-phone">-</strong>
+                    </div>
+                    <div class="modal-summary-row">
+                        <span>Địa chỉ</span>
+                        <strong id="modal-customer-address">-</strong>
+                    </div>
+                </div>
+                <div class="order-success-actions">
+                    <button class="btn-primary" onclick="viewOrderDetailFromModal()">Xem chi tiết đơn hàng</button>
+                    <button class="btn-secondary" onclick="continueShoppingFromModal()">Tiếp tục mua sắm</button>
                 </div>
             </div>
         </div>
-    </div>
     </main>
 </div>
 <script src="app.js"></script>
-    <div class="promo-popup-overlay" id="promo-popup">
-        <div class="promo-popup-content">
-            <button class="promo-popup-close" onclick="closePromoPopup()">
-                <i class="fas fa-times"></i>
-            </button>
+<div class="promo-popup-overlay" id="promo-popup">
+    <div class="promo-popup-content">
+        <button class="promo-popup-close" onclick="closePromoPopup()">
+            <i class="fas fa-times"></i>
+        </button>
 
-            <a href="#" onclick="closePromoPopup(); navigateTo('products');">
-                <img src="assets/images/quangcao1.png" alt="Siêu Sale Hôm Nay" id="promo-popup-img">
-            </a>
-        </div>
+        <a href="#" onclick="closePromoPopup(); navigateTo('products');">
+            <img src="assets/images/quangcao1.png" alt="Siêu Sale Hôm Nay" id="promo-popup-img">
+        </a>
     </div>
+</div>
 </body>
 </html>

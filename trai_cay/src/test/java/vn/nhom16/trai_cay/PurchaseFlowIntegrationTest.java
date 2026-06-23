@@ -127,9 +127,14 @@ public class PurchaseFlowIntegrationTest {
                 .andExpect(status().isOk());
         
         // Step 10: Update order status (Admin only)
-        mockMvc.perform(put("/api/orders/" + orderId + "/status?status=CONFIRMED")
-                .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk() | status().isForbidden()); // May be forbidden if not admin
+      mockMvc.perform(put("/api/orders/" + orderId + "/status?status=CONFIRMED")
+        .header("Authorization", "Bearer " + token))
+        .andExpect(result -> {
+            int status = result.getResponse().getStatus();
+            org.junit.jupiter.api.Assertions.assertTrue(
+                    status == 200 || status == 403
+            );
+        });
     }
     
     @Test

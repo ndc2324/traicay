@@ -1,5 +1,6 @@
 package vn.nhom16.trai_cay.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,46 +18,43 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false)
     private String customerName;
-    
+
     @Column(nullable = false)
     private String phone;
-    
+
     @Column(nullable = false)
     private String address;
-    
+
     private String notes;
-    
+
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
-    
+
     @Column(nullable = false)
     private Double totalAmount;
-    
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
-    
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
-    
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<OrderItem> items;
-    
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     public enum PaymentMethod {
-        TRANSFER,
-        COD,
-        EWALLET
+        TRANSFER, COD, EWALLET
     }
+
     public enum OrderStatus {
-        PROCESSING,
-        SHIPPED,
-        DELIVERED,
-        CANCELLED
+        PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
     }
 }

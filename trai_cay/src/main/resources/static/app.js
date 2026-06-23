@@ -35,6 +35,7 @@
     let currentUser = null;
     let authToken = null;
     let quickBuyProductId = null;
+    let lastOrderData = null;
     let featuredOffset = 0;
     const FEATURED_PER_PAGE = 4;
 
@@ -622,52 +623,63 @@
             updateCartBadge();
         }
     }
+function renderCart() {
+    const cartItems = document.getElementById('cart-items');
+    if (!cartItems) return;
 
-    function renderCart() {
-        const cartItems = document.getElementById('cart-items');
-        if (!cartItems) return;
-
-        if (cart.length === 0) {
-            cartItems.innerHTML = '<tr><td colspan="5" class="empty-cart">Giỏ hàng trống</td></tr>';
-            document.getElementById('subtotal').textContent = '0đ';
-            document.getElementById('total').textContent = '0đ';
-            return;
-        }
-
-        let subtotal = 0;
-        cartItems.innerHTML = cart.map((item, index) => {
-            const itemTotal = item.price * item.quantity;
-            subtotal += itemTotal;
-            return `
-                <tr>
-                    <td>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span>${item.name}</span>
-                        </div>
-                    </td>
-                    <td>${formatPrice(item.price)}</td>
-                    <td>
-                        <div class="quantity-control">
-                            <button onclick="updateQuantity(${index}, -1)">-</button>
-                            <input type="number" value="${item.quantity}" min="1"
-                                onchange="setQuantity(${index}, this.value)">
-                            <button onclick="updateQuantity(${index}, 1)">+</button>
-                        </div>
-                    </td>
-                    <td>${formatPrice(itemTotal)}</td>
-                    <td>
-                        <button class="btn-delete" onclick="removeFromCart(${index})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        document.getElementById('subtotal').textContent = formatPrice(subtotal);
-        document.getElementById('total').textContent = formatPrice(subtotal);
+    if (cart.length === 0) {
+        cartItems.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; padding:60px 20px; color:#888;">
+                    <i class="fas fa-shopping-bag" style="font-size:48px; margin-bottom:16px; opacity:0.3;"></i><br>
+                    Giỏ hàng của bạn đang trống
+                </td>
+            </tr>`;
+        document.getElementById('subtotal').textContent = '0đ';
+        document.getElementById('total').textContent = '0đ';
+        return;
     }
 
+    let subtotal = 0;
+
+    cartItems.innerHTML = cart.map((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+
+        const prod = productsFromDb.find(p => p.name === item.name);
+        const imgUrl = prod ? prod.imageUrl : 'https://via.placeholder.com/80';
+
+        return `
+            <tr>
+                <td>
+                    <div class="cart-product">
+                        <img src="${imgUrl}" alt="${item.name}">
+                        <div>
+                            <strong>${item.name}</strong>
+                        </div>
+                    </div>
+                </td>
+                <td>${formatPrice(item.price)}</td>
+                <td>
+                    <div class="quantity-box">
+                        <button onclick="updateQuantity(${index}, -1)">–</button>
+                        <input type="number" value="${item.quantity}" onchange="setQuantity(${index}, this.value)">
+                        <button onclick="updateQuantity(${index}, 1)">+</button>
+                    </div>
+                </td>
+                <td><strong>${formatPrice(itemTotal)}</strong></td>
+                <td>
+                    <button class="btn-delete" onclick="removeFromCart(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    document.getElementById('subtotal').textContent = formatPrice(subtotal);
+    document.getElementById('total').textContent = formatPrice(subtotal);
+}
     function updateQuantity(index, change) {
         cart[index].quantity = Math.max(1, cart[index].quantity + change);
         updateCartBadge();
@@ -691,64 +703,6 @@
         saveCart();
         renderCart();
     }
-
-
-    // ==================== CHECKOUT ====================
-
-
-  function onPaymentChange(method) {
-      const bankPanel = document.getElementById('bank-detail-panel');
-      const ewalletPanel = document.getElementById('ewallet-panel');
-
-      if (bankPanel) bankPanel.classList.remove('show');
-      if (ewalletPanel) ewalletPanel.style.display = 'none';
-
-      if (method === 'transfer') {
-          if (bankPanel) {
-              bankPanel.classList.add('show');
-              updateBankTransferAmount();
-          }
-      } else if (method === 'ewallet') {
-          if (ewalletPanel) ewalletPanel.style.display = 'block';
-      }
-  }
-
-  function updateBankTransferAmount() {
-      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const el = document.getElementById('bank-transfer-amount');
-      if (el) el.textContent = formatPrice(subtotal);
-  }
-
-  function copyText(text, btn) {
-      navigator.clipboard.writeText(text).then(() => {
-          const icon = btn.querySelector('i');
-          if (icon) icon.className = 'fas fa-check';
-          btn.classList.add('copied');
-          setTimeout(() => {
-              if (icon) icon.className = 'fas fa-copy';
-              btn.classList.remove('copied');
-          }, 2000);
-      }).catch(() => {
-          const el = document.createElement('textarea');
-          el.value = text;
-          document.body.appendChild(el);
-          el.select();
-          document.execCommand('copy');
-          document.body.removeChild(el);
-      });
-  }
-
-  function copyBankNote(btn) {
-      const phone = document.getElementById('phone')?.value || 'SĐT';
-      const note = 'FF' + phone;
-      copyText(note, btn);
-  }
-
-  function selectEwallet(btn, wallet) {
-      document.querySelectorAll('.ewallet-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-  }
-
   function applyCoupon() {
       const code = document.getElementById('checkout-coupon')?.value.trim().toUpperCase();
       if (!code) return;
@@ -783,16 +737,13 @@
   // Override renderCheckout để cập nhật UI mới
   const _originalRenderCheckout = typeof renderCheckout === 'function' ? renderCheckout : null;
 
-  function renderCheckout() {
+function renderCheckout() {
       const checkoutItems = document.getElementById('checkout-items');
       if (!checkoutItems) return;
 
       if (cart.length === 0) {
           checkoutItems.innerHTML = '<p class="empty-cart">Không có sản phẩm</p>';
-          [
-           'checkout-subtotal',
-           'checkout-total'
-          ].forEach(id => {
+          ['checkout-subtotal', 'checkout-total'].forEach(id => {
               const el = document.getElementById(id);
               if (el) el.textContent = '0đ';
           });
@@ -828,75 +779,234 @@
           if (phoneEl && !phoneEl.value) phoneEl.value = currentUser.phone || '';
           if (addressEl && !addressEl.value) addressEl.value = currentUser.address || '';
       }
-    function placeOrder() {
-        if (cart.length === 0) {
-            alert('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi đặt hàng.');
-            return;
-        }
-        if (!currentUser) {
-            alert('Vui lòng đăng nhập để đặt hàng');
-            navigateTo('login');
-            return;
-        }
+  }
 
-        const fullname = document.getElementById('fullname').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const address = document.getElementById('address').value.trim();
+function placeOrder() {
+    if (cart.length === 0) {
+        alert('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi đặt hàng.');
+        return;
+    }
+    if (!currentUser) {
+        alert('Vui lòng đăng nhập để đặt hàng');
+        navigateTo('login');
+        return;
+    }
 
-        if (!fullname || !phone || !address) {
-            alert('Vui lòng điền đầy đủ thông tin giao hàng.');
-            return;
-        }
+    const fullname = document.getElementById('fullname').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const notes = document.getElementById('notes') ? document.getElementById('notes').value.trim() : '';
 
-        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-        const order = {
-        orderCode:'FF' + Date.now(),
-        }
-            customerName: fullname,
-            phone,
-            address,
-            notes: document.getElementById('notes').value,
-            paymentMethod,
-            items: cart,
-            total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-           status: 'PROCESSING',
-            createdAt: new Date().toISOString()
-        };
+    if (!fullname || !phone || !address) {
+        alert('Vui lòng điền đầy đủ thông tin giao hàng.');
+        return;
+    }
 
-        fetch('/api/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + authToken
+    // 1. Tính toán tổng tiền cuối cùng sau khi áp dụng coupon (nếu có)
+    let totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const discountRow = document.getElementById('discount-row');
+    const discountAmountEl = document.getElementById('discount-amount');
+
+    if (discountRow && discountRow.style.display !== 'none' && discountAmountEl) {
+        const discountText = discountAmountEl.textContent.replace(/[^\d]/g, '');
+        const discountValue = parseInt(discountText) || 0;
+        totalAmount = Math.max(0, totalAmount - discountValue);
+    }
+
+    // 2. Chuyển đổi mảng cart thành cấu trúc khớp với OrderDetailDTO/Entity ở Backend
+    // Tìm kiếm id của sản phẩm dựa trên tên sản phẩm trong giỏ hàng
+    const formattedItems = cart.map(item => {
+        const matchingProduct = productsFromDb.find(p => p.name === item.name);
+        return {
+            product: {
+                id: matchingProduct ? matchingProduct.id : null // Truyền đối tượng chứa ID để JPA Mapping hoạt động
             },
-            body: JSON.stringify(order)
-        })
-        .then(res => {
-            if (!res.ok) throw new Error('Đặt hàng thất bại');
-            return res.json();
-        })
-      .then(data => {
-          localStorage.setItem(
-              'lastOrder',
-              JSON.stringify(data)
-          );
-          cart = [];
-          updateCartBadge();
-          saveCart();
-          showOrderConfirmation(data);
-      });
-        .catch(() => alert('Có lỗi xảy ra. Vui lòng thử lại.'));
+            productName: item.name,
+            quantity: item.quantity,
+            price: item.price
+        };
+    });
+
+    // Kiểm tra tính hợp lệ dữ liệu ID sản phẩm
+    const hasInvalidItem = formattedItems.some(item => item.product.id === null);
+    if (hasInvalidItem) {
+        alert('Phát hiện sản phẩm không hợp lệ trong giỏ hàng. Vui lòng làm mới trang.');
+        return;
     }
 
-    function showOrderConfirmation(data) {
-       document.getElementById('confirm-payment').textContent ='Thanh toán khi nhận hàng (COD)';
-        document.getElementById('confirm-total').textContent = formatPrice(data.totalAmount || data.total || 0);
-        document.getElementById('confirm-payment').textContent = data.paymentMethod || 'COD';
-        document.getElementById('confirm-name').textContent = data.customerName || '';
-        document.getElementById('confirm-phone').textContent = data.phone || '';
-        document.getElementById('confirm-address').textContent = data.address || '';
-        navigateTo('order-confirmation');
+    // 3. Khởi tạo Payload gửi lên Spring Boot API
+    const orderPayload = {
+        customerName: fullname,
+        phone: phone,
+        address: address,
+        notes: notes,
+        paymentMethod: 'COD',
+        totalAmount: totalAmount,
+        status: 'PENDING',
+        items: formattedItems,
+        user: {
+            id: currentUser.userId
+        }
+    };
+
+    console.log("Dữ liệu đơn hàng gửi lên Backend:", orderPayload); // Bạn có thể F12 Console để xem thử log
+
+    if (!authToken) {
+        alert('Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
+        logout();
+        navigateTo('login');
+        return;
     }
+
+    // 4. Tiến hành gọi API lưu đơn hàng
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    if (authToken) {
+        headers['Authorization'] = 'Bearer ' + authToken;
+    }
+
+    fetch('/api/orders', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(orderPayload)
+    })
+    .then(res => {
+        if (!res.ok) {
+            // Log chi tiết lỗi từ server để dễ debug nếu backend trả ra message cụ thể
+            return res.text().then(text => { throw new Error(text || 'Đặt hàng thất bại từ hệ thống.'); });
+        }
+        return res.json();
+    })
+    .then(savedOrder => {
+        // Xóa giỏ hàng khi đặt hàng thành công
+        cart = [];
+        updateCartBadge();
+        saveCart();
+        renderCart();
+        renderCheckout();
+
+        // Reset form nhập liệu thông tin
+        document.getElementById('order-form')?.reset();
+
+        // Hiển thị modal thông báo đặt hàng thành công
+        showOrderSuccessModal(savedOrder);
+    })
+    .catch(error => {
+        console.error('Lỗi chi tiết từ hệ thống:', error);
+        alert('Có lỗi xảy ra trong quá trình đặt hàng. Vui lòng kiểm tra log hệ thống.');
+    });
+}
+
+function showOrderConfirmation(data) {
+    renderOrderConfirmationPage(data);
+    navigateTo('order-confirmation');
+}
+
+function renderOrderConfirmationPage(orderData) {
+    if (!orderData) return;
+    lastOrderData = orderData;
+
+    document.getElementById('confirm-order-id').textContent = '#' + (orderData.id || '---');
+    document.getElementById('confirm-total').textContent = formatPrice(orderData.totalAmount || orderData.total || 0);
+    document.getElementById('confirm-status').textContent = orderData.status === 'PENDING' ? 'Chờ xác nhận' : (orderData.status || 'Đang xử lý');
+    document.getElementById('confirm-payment').textContent = formatPaymentMethod(orderData.paymentMethod);
+    document.getElementById('confirm-name').textContent = orderData.customerName || '';
+    document.getElementById('confirm-phone').textContent = orderData.phone || '';
+    document.getElementById('confirm-address').textContent = orderData.address || '';
+    document.getElementById('confirm-date').textContent = formatDateTime(orderData.createdAt);
+
+    const itemsContainer = document.getElementById('confirm-order-items');
+    if (itemsContainer) {
+        if (orderData.items && orderData.items.length > 0) {
+            itemsContainer.innerHTML = orderData.items.map(item => {
+                const subtotal = item.subtotal || (item.price * item.quantity);
+                return `
+                    <div class="order-item-row">
+                        <div class="item-name">${item.productName || 'Sản phẩm'}</div>
+                        <div class="item-quantity">${item.quantity || 0}</div>
+                        <div class="item-price">${formatPrice(item.price || 0)}</div>
+                        <div class="item-subtotal">${formatPrice(subtotal)}</div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            itemsContainer.innerHTML = '<p class="empty-order-items">Không có sản phẩm trong đơn hàng.</p>';
+        }
+    }
+}
+
+function formatPaymentMethod(method) {
+    if (!method) return 'COD';
+    const upper = String(method).toUpperCase();
+    if (upper === 'COD') return 'Thanh toán khi nhận hàng (COD)';
+    if (upper === 'TRANSFER') return 'Chuyển khoản';
+    if (upper === 'EWALLET') return 'Ví điện tử';
+    return upper;
+}
+
+function formatDateTime(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return new Intl.DateTimeFormat('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).format(date);
+}
+
+function setTextContentIfExists(id, value) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.textContent = value;
+    }
+    return el;
+}
+
+// ==================== ORDER SUCCESS MODAL ====================
+function showOrderSuccessModal(orderData) {
+    if (!orderData) return;
+    lastOrderData = orderData;
+
+    setTextContentIfExists('modal-order-id', '#' + (orderData.id || '---'));
+    setTextContentIfExists('modal-order-total', formatPrice(orderData.totalAmount || orderData.total || 0));
+    setTextContentIfExists('modal-order-status', orderData.status === 'PENDING' ? 'Chờ xác nhận' : (orderData.status || 'Đang xử lý'));
+    setTextContentIfExists('modal-payment-method', formatPaymentMethod(orderData.paymentMethod));
+    setTextContentIfExists('modal-customer-name', orderData.customerName || '-');
+    setTextContentIfExists('modal-customer-phone', orderData.phone || '-');
+    setTextContentIfExists('modal-customer-address', orderData.address || '-');
+    setTextContentIfExists('modal-order-date', formatDateTime(orderData.createdAt));
+
+    const modal = document.getElementById('order-success-modal');
+    const overlay = document.getElementById('order-success-overlay');
+    if (modal && overlay) {
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+}
+
+function closeOrderSuccessModal() {
+    const modal = document.getElementById('order-success-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function viewOrderDetailFromModal() {
+    closeOrderSuccessModal();
+    if (lastOrderData) {
+        renderOrderConfirmationPage(lastOrderData);
+    }
+    navigateTo('order-confirmation');
+}
+
+function continueShoppingFromModal() {
+    closeOrderSuccessModal();
+    navigateTo('home');
+}
 
 
     // ==================== POPUP ====================
@@ -1222,23 +1332,3 @@ setInterval(() => {
     showTestimonial(testimonialIndex);
 
 }, 4000);
-function showLastOrder() {
-    const order = JSON.parse(localStorage.getItem('lastOrder'));
-
-    if (!order) {
-        alert('Không tìm thấy đơn hàng.');
-        return;
-    }
-
-    let text = `
-Mã đơn: ${order.orderCode}
-Khách hàng: ${order.customerName}
-SĐT: ${order.phone}
-Địa chỉ: ${order.address}
-Thanh toán: COD
-Trạng thái: Đang xử lý
-Tổng tiền: ${formatPrice(order.total)}
-`;
-
-    alert(text.trim());
-}
