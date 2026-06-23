@@ -789,7 +789,10 @@
 
       if (cart.length === 0) {
           checkoutItems.innerHTML = '<p class="empty-cart">Không có sản phẩm</p>';
-          ['checkout-subtotal', 'checkout-total', 'bank-transfer-amount'].forEach(id => {
+          [
+           'checkout-subtotal',
+           'checkout-total'
+          ].forEach(id => {
               const el = document.getElementById(id);
               if (el) el.textContent = '0đ';
           });
@@ -825,16 +828,6 @@
           if (phoneEl && !phoneEl.value) phoneEl.value = currentUser.phone || '';
           if (addressEl && !addressEl.value) addressEl.value = currentUser.address || '';
       }
-
-      // Mặc định hiện panel chuyển khoản (vì radio checked=transfer)
-      const transferRadio = document.querySelector('input[name="payment"][value="transfer"]');
-      if (transferRadio && transferRadio.checked) {
-          onPaymentChange('transfer');
-      }
-
-      updateBankTransferAmount();
-  }
-
     function placeOrder() {
         if (cart.length === 0) {
             alert('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi đặt hàng.');
@@ -857,6 +850,8 @@
 
         const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
         const order = {
+        orderCode:'FF' + Date.now(),
+        }
             customerName: fullname,
             phone,
             address,
@@ -864,7 +859,7 @@
             paymentMethod,
             items: cart,
             total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-            status: 'PENDING',
+           status: 'PROCESSING',
             createdAt: new Date().toISOString()
         };
 
@@ -880,18 +875,21 @@
             if (!res.ok) throw new Error('Đặt hàng thất bại');
             return res.json();
         })
-        .then(data => {
-            cart = [];
-            updateCartBadge();
-            saveCart();
-            document.getElementById('order-form').reset();
-            showOrderConfirmation(data);
-        })
+      .then(data => {
+          localStorage.setItem(
+              'lastOrder',
+              JSON.stringify(data)
+          );
+          cart = [];
+          updateCartBadge();
+          saveCart();
+          showOrderConfirmation(data);
+      });
         .catch(() => alert('Có lỗi xảy ra. Vui lòng thử lại.'));
     }
 
     function showOrderConfirmation(data) {
-        document.getElementById('confirm-order-id').textContent = '#' + data.id;
+       document.getElementById('confirm-payment').textContent ='Thanh toán khi nhận hàng (COD)';
         document.getElementById('confirm-total').textContent = formatPrice(data.totalAmount || data.total || 0);
         document.getElementById('confirm-payment').textContent = data.paymentMethod || 'COD';
         document.getElementById('confirm-name').textContent = data.customerName || '';
@@ -1224,3 +1222,23 @@ setInterval(() => {
     showTestimonial(testimonialIndex);
 
 }, 4000);
+function showLastOrder() {
+    const order = JSON.parse(localStorage.getItem('lastOrder'));
+
+    if (!order) {
+        alert('Không tìm thấy đơn hàng.');
+        return;
+    }
+
+    let text = `
+Mã đơn: ${order.orderCode}
+Khách hàng: ${order.customerName}
+SĐT: ${order.phone}
+Địa chỉ: ${order.address}
+Thanh toán: COD
+Trạng thái: Đang xử lý
+Tổng tiền: ${formatPrice(order.total)}
+`;
+
+    alert(text.trim());
+}

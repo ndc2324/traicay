@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.nhom16.trai_cay.entity.Order;
+import vn.nhom16.trai_cay.repository.OrderRepository;
 import vn.nhom16.trai_cay.service.OrderService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -53,6 +55,7 @@ public class OrderController {
         }
         return ResponseEntity.notFound().build();
     }
+
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
@@ -60,3 +63,4 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 }
+

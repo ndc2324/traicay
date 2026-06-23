@@ -599,7 +599,10 @@
 
                                 <!-- COD -->
                                 <label class="payment-option" id="opt-cod">
-                                    <input type="radio" name="payment" value="cod" onchange="onPaymentChange('cod')">
+                                    <input type="radio"
+                                           name="payment"
+                                           value="COD"
+                                           checked>
                                     <div class="payment-option-content">
                                         <div class="payment-icon cod-icon">
                                             <i class="fas fa-money-bill-wave"></i>
@@ -612,20 +615,7 @@
                                     </div>
                                 </label>
 
-                                <!-- Chuyển khoản ngân hàng -->
-                                <label class="payment-option" id="opt-transfer">
-                                    <input type="radio" name="payment" value="transfer" checked onchange="onPaymentChange('transfer')">
-                                    <div class="payment-option-content">
-                                        <div class="payment-icon bank-icon">
-                                            <i class="fas fa-university"></i>
-                                        </div>
-                                        <div class="payment-info">
-                                            <strong>Chuyển khoản ngân hàng</strong>
-                                            <span>Quét QR hoặc chuyển khoản thủ công</span>
-                                        </div>
-                                        <div class="payment-check"><i class="fas fa-check-circle"></i></div>
-                                    </div>
-                                </label>
+
 
                                 <!-- Chi tiết chuyển khoản (hiện khi chọn) -->
                                 <div class="bank-detail-panel" id="bank-detail-panel">
@@ -692,26 +682,6 @@
                                         <div class="payment-check"><i class="fas fa-check-circle"></i></div>
                                     </div>
                                 </label>
-
-                                <!-- Chi tiết ví điện tử -->
-                                <div class="ewallet-panel" id="ewallet-panel" style="display:none;">
-                                    <div class="ewallet-options">
-                                        <button class="ewallet-btn active" onclick="selectEwallet(this, 'momo')">
-                                            <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" onerror="this.style.display='none'">
-                                            <span>MoMo</span>
-                                        </button>
-                                        <button class="ewallet-btn" onclick="selectEwallet(this, 'zalopay')">
-                                            <img src="https://zalopay.vn/images/logo.svg" alt="ZaloPay" onerror="this.style.display='none'">
-                                            <span>ZaloPay</span>
-                                        </button>
-                                        <button class="ewallet-btn" onclick="selectEwallet(this, 'vnpay')">
-                                            <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png" alt="VNPay" onerror="this.style.display='none'">
-                                            <span>VNPay</span>
-                                        </button>
-                                    </div>
-                                    <p class="ewallet-note"><i class="fas fa-info-circle"></i> Bạn sẽ được chuyển đến ứng dụng ví để hoàn tất thanh toán sau khi đặt hàng.</p>
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -899,7 +869,7 @@
 
                     <div class="confirmation-actions">
                         <button class="btn-primary" onclick="navigateTo('home')">Tiếp tục mua sắm</button>
-                        <button class="btn-secondary" onclick="navigateTo('profile')">Xem đơn hàng</button>
+                        <button class="btn-secondary" onclick="showLastOrder()">Xem chi tiết đơn hàng</button>
                     </div>
                 </div>
             </div>

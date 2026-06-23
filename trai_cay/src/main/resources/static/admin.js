@@ -5,10 +5,9 @@ let currentUser = null;
 let authToken = null;
 
 const orderStatusLabel = {
-    PENDING: 'Chờ xác nhận',
-    CONFIRMED: 'Đã xác nhận',
+    PROCESSING: 'Đang xử lý',
     SHIPPED: 'Đang giao',
-    DELIVERED: 'Đã giao',
+    DELIVERED: 'Hoàn thành',
     CANCELLED: 'Đã hủy'
 };
 
@@ -121,7 +120,13 @@ function renderOrderTable(orders) {
             <td>${new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
             <td>
                 <button class="btn-secondary" onclick="openOrderDetail(${order.id})">Xem</button>
-                <button class="btn-secondary" onclick="updateOrderStatus(${order.id})">Cập nhật</button>
+
+                <select class="status-select" onchange="updateOrderStatus(${order.id}, this.value)">
+                    <option value="PROCESSING" ${order.status === 'PROCESSING' ? 'selected' : ''}>Đang xử lý</option>
+                    <option value="SHIPPED" ${order.status === 'SHIPPED' ? 'selected' : ''}>Đang giao</option>
+                    <option value="DELIVERED" ${order.status === 'DELIVERED' ? 'selected' : ''}>Hoàn thành</option>
+                    <option value="CANCELLED" ${order.status === 'CANCELLED' ? 'selected' : ''}>Đã hủy</option>
+                </select>
             </td>
         `;
         tbody.appendChild(row);
@@ -436,28 +441,35 @@ function closeOrderDetail() {
     document.getElementById('order-detail-modal').classList.remove('show');
 }
 
-function updateOrderStatus(orderId) {
-    const status = prompt('Nhập trạng thái mới (PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED):');
-    if (!status) return;
+function updateOrderStatus(id, status) {
 
-    fetch(`/api/orders/${orderId}/status?status=${status.toUpperCase()}`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + authToken
+    fetch(
+        `/api/orders/${id}/status`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type':
+                    'application/json'
+            },
+            body: JSON.stringify({
+                status: status
+            })
         }
-    })
+    )
     .then(response => {
-        if (response.ok) {
-            alert('Cập nhật trạng thái thành công!');
-            loadAdminOrders('ALL');
-            closeOrderDetail();
-        } else {
-            alert('Cập nhật trạng thái thất bại.');
+        if (!response.ok) {
+            throw new Error(
+                'Cập nhật thất bại'
+            );
         }
+
+        loadAdminOrders('ALL');
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Lỗi khi cập nhật trạng thái.');
+        console.error(error);
+        alert(
+            'Không thể cập nhật trạng thái.'
+        );
     });
 }
 
