@@ -33,8 +33,15 @@ public class OrderService {
 
     public Order createOrder(Order order) {
 
-        order.setCreatedAt(LocalDateTime.now());
 
+        order.setCreatedAt(LocalDateTime.now());
+        order.setPaymentMethod(
+                Order.PaymentMethod.COD
+        );
+
+        order.setStatus(
+                Order.OrderStatus.PROCESSING
+        );
         double total = 0;
 
         if (order.getItems() != null) {

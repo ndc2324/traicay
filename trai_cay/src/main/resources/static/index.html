@@ -596,7 +596,6 @@
                             </div>
 
                             <div class="payment-options">
-
                                 <!-- COD -->
                                 <label class="payment-option" id="opt-cod">
                                     <input type="radio"
@@ -610,74 +609,6 @@
                                         <div class="payment-info">
                                             <strong>Thanh toán khi nhận hàng (COD)</strong>
                                             <span>Trả tiền mặt khi nhận hàng tại nhà</span>
-                                        </div>
-                                        <div class="payment-check"><i class="fas fa-check-circle"></i></div>
-                                    </div>
-                                </label>
-
-
-
-                                <!-- Chi tiết chuyển khoản (hiện khi chọn) -->
-                                <div class="bank-detail-panel" id="bank-detail-panel">
-                                    <div class="bank-detail-inner">
-                                        <div class="qr-section">
-                                            <div class="qr-placeholder">
-                                                <!-- QR thật nên tạo bằng API VietQR hoặc dùng ảnh tĩnh -->
-                                                <img src="https://img.vietqr.io/image/VCB-1234567890-compact2.jpg?amount=0&addInfo=ThanhToanFreshFruit&accountName=FRESH%20FRUIT"
-                                                     alt="QR Thanh toán"
-                                                     onerror="this.parentElement.innerHTML='<div class=qr-fallback><i class=fas fa-qrcode></i><p>QR thanh toán</p></div>'">
-                                            </div>
-                                            <p class="qr-hint">Quét để thanh toán tự động</p>
-                                        </div>
-                                        <div class="bank-info-list">
-                                            <div class="bank-info-item">
-                                                <span>Ngân hàng</span>
-                                                <strong>Vietcombank (VCB)</strong>
-                                            </div>
-                                            <div class="bank-info-item">
-                                                <span>Số tài khoản</span>
-                                                <div class="copy-row">
-                                                    <strong id="bank-account-number">1234567890</strong>
-                                                    <button class="btn-copy" onclick="copyText('1234567890', this)" title="Sao chép">
-                                                        <i class="fas fa-copy"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="bank-info-item">
-                                                <span>Chủ tài khoản</span>
-                                                <strong>FRESH FRUIT CO.</strong>
-                                            </div>
-                                            <div class="bank-info-item">
-                                                <span>Số tiền</span>
-                                                <strong class="amount-highlight" id="bank-transfer-amount">0đ</strong>
-                                            </div>
-                                            <div class="bank-info-item">
-                                                <span>Nội dung CK</span>
-                                                <div class="copy-row">
-                                                    <strong id="bank-transfer-note">FF + SĐT của bạn</strong>
-                                                    <button class="btn-copy" onclick="copyBankNote(this)" title="Sao chép">
-                                                        <i class="fas fa-copy"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="bank-transfer-note-box">
-                                                <i class="fas fa-info-circle"></i>
-                                                Đơn hàng sẽ được xác nhận trong vòng <strong>15 phút</strong> sau khi chuyển khoản thành công.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Ví điện tử -->
-                                <label class="payment-option" id="opt-ewallet">
-                                    <input type="radio" name="payment" value="ewallet" onchange="onPaymentChange('ewallet')">
-                                    <div class="payment-option-content">
-                                        <div class="payment-icon ewallet-icon">
-                                            <i class="fas fa-wallet"></i>
-                                        </div>
-                                        <div class="payment-info">
-                                            <strong>Ví điện tử</strong>
-                                            <span>MoMo, ZaloPay, VNPay</span>
                                         </div>
                                         <div class="payment-check"><i class="fas fa-check-circle"></i></div>
                                     </div>

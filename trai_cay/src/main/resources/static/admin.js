@@ -105,7 +105,7 @@ function renderOrderTable(orders) {
 
     orders.forEach(order => {
         const statusClass =
-            order.status === 'PENDING' ? 'badge-warning' :
+            order.status === 'PROCESSING' ? 'badge-warning' :
             order.status === 'CONFIRMED' ? 'badge-success' :
             order.status === 'SHIPPED' ? 'badge-warning' :
             order.status === 'DELIVERED' ? 'badge-success' :
@@ -787,11 +787,11 @@ function renderRecentOrders(orders) {
     if (!container) return;
 
     const statusLabel = {
-        PENDING: 'Chờ xử lý', CONFIRMED: 'Xác nhận',
+        PROCESSING: 'Chờ xử lý', CONFIRMED: 'Xác nhận',
         SHIPPED: 'Đang giao', DELIVERED: 'Đã giao', CANCELLED: 'Hủy'
     };
     const statusClass = {
-        PENDING: 'badge-warning', CONFIRMED: 'badge-success',
+       PROCESSING: 'badge-warning', CONFIRMED: 'badge-success',
         SHIPPED: 'badge-warning', DELIVERED: 'badge-success', CANCELLED: 'badge-danger'
     };
 

@@ -47,12 +47,16 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    
+
     public enum PaymentMethod {
-        TRANSFER, COD, EWALLET
+        TRANSFER,
+        COD,
+        EWALLET
     }
-    
     public enum OrderStatus {
-        PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+        PROCESSING,
+        SHIPPED,
+        DELIVERED,
+        CANCELLED
     }
 }
