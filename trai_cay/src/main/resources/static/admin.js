@@ -210,6 +210,10 @@ function loadAdminCategories() {
             adminProducts = Array.isArray(products) ? products : (products.data || products.content || []);
             adminCategories = categories;
             renderCategoryTable(categories);
+            const statCategoriesEl = document.getElementById('stat-categories');
+                        if (statCategoriesEl) {
+                            statCategoriesEl.textContent = adminCategories.length;
+                        }
             return categories;
         })
         .catch(error => {
@@ -511,12 +515,21 @@ function openOrderDetail(orderId) {
     })
         .then(response => response.json())
         .then(order => {
+            // Đổ dữ liệu 4 thông số cơ bản
             document.getElementById('order-detail-code').textContent = `Mã đơn: #${order.id}`;
             document.getElementById('order-detail-customer').textContent = order.customerName || '-';
             document.getElementById('order-detail-status').textContent = orderStatusLabel[order.status] || order.status;
             document.getElementById('order-detail-date').textContent = new Date(order.createdAt).toLocaleDateString('vi-VN');
             document.getElementById('order-detail-total').textContent = (order.totalAmount || 0).toLocaleString('vi-VN') + 'đ';
 
+            // --- ĐỔ DỮ LIỆU THÔNG TIN GIAO HÀNG ---
+            // Lưu ý: Các trường (phone, email, address, note) cần khớp với thuộc tính thực tế trả về từ Backend Spring Boot của bạn.
+            document.getElementById('order-detail-phone').textContent = order.phone || order.phoneNumber || 'Không có';
+            document.getElementById('order-detail-email').textContent = order.email || 'Không có';
+            document.getElementById('order-detail-address').textContent = order.address || order.shippingAddress || 'Không có';
+            document.getElementById('order-detail-note').textContent = order.note || order.description || 'Không có ghi chú';
+
+            // Đổ dữ liệu danh sách sản phẩm
             const itemsBody = document.getElementById('order-detail-items');
             itemsBody.innerHTML = '';
             if (Array.isArray(order.items) && order.items.length) {
@@ -538,6 +551,7 @@ function openOrderDetail(orderId) {
                 itemsBody.innerHTML = '<tr><td colspan="3">Không có sản phẩm</td></tr>';
             }
 
+            // Hiển thị modal
             document.getElementById('order-detail-modal').classList.add('show');
         })
         .catch(error => {
@@ -727,12 +741,6 @@ function loadAdminDashboard() {
             .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
             .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
         document.getElementById('stat-revenue').textContent = revenue.toLocaleString('vi-VN') + 'đ';
-
-const completedOrdersCount = adminOrders.filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED').length;
-const statCompletedEl = document.getElementById('stat-completed-orders');
-if (statCompletedEl) {
-    statCompletedEl.textContent = completedOrdersCount;
-}
         const confirmedCount = adminOrders.filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED').length;
         const conversion = adminOrders.length ? Math.round((confirmedCount / adminOrders.length) * 100) : 0;
         document.getElementById('stat-conversion').textContent = conversion + '%';

@@ -76,9 +76,9 @@
                         <span class="stat-caption">Tổng doanh thu xác nhận</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Tổng hợp đơn</h3>
-                        <p id="stat-completed-orders" class="stat-number">0</p>
-                        <span class="stat-caption">Đơn hàng hoàn thành / Đã giao</span>
+                        <h3>Tổng danh mục</h3>
+                        <p id="stat-categories" class="stat-number">0</p>
+                        <span class="stat-caption">Các nhóm sản phẩm hiện có</span>
                     </div>
                 </div>
 
@@ -347,6 +347,7 @@
             <button class="btn-close" onclick="closeOrderDetail()"><i class="fas fa-times"></i></button>
         </div>
         <div class="modal-body">
+            <!-- 4 Thông số cơ bản -->
             <div class="detail-grid">
                 <div class="detail-box">
                     <span>Khách hàng</span>
@@ -365,6 +366,31 @@
                     <strong id="order-detail-total">-</strong>
                 </div>
             </div>
+
+            <!-- THÊM MỚI: Khối thông tin liên hệ và giao hàng -->
+            <div style="background: #f8faf4; padding: 20px; border-radius: 16px; margin-bottom: 24px; border: 1px solid #eef3ea;">
+                <h4 style="margin: 0 0 16px; color: #1d3d1b; font-size: 16px;">Thông tin giao hàng</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                    <div>
+                        <span style="display: block; font-size: 13px; color: #6f856f; margin-bottom: 4px;">Số điện thoại</span>
+                        <strong id="order-detail-phone" style="color: #1d3d1b; font-size: 15px;">-</strong>
+                    </div>
+                    <div>
+                        <span style="display: block; font-size: 13px; color: #6f856f; margin-bottom: 4px;">Email</span>
+                        <strong id="order-detail-email" style="color: #1d3d1b; font-size: 15px;">-</strong>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <span style="display: block; font-size: 13px; color: #6f856f; margin-bottom: 4px;">Địa chỉ nhận hàng</span>
+                        <strong id="order-detail-address" style="color: #1d3d1b; font-size: 15px;">-</strong>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <span style="display: block; font-size: 13px; color: #6f856f; margin-bottom: 4px;">Ghi chú của khách</span>
+                        <strong id="order-detail-note" style="color: #1d3d1b; font-size: 15px;">-</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng danh sách sản phẩm -->
             <div class="order-items-panel">
                 <h4>Sản phẩm trong đơn</h4>
                 <table class="admin-table">
@@ -385,6 +411,7 @@
             <button class="btn-secondary" onclick="closeOrderDetail()">Đóng</button>
         </div>
     </div>
+</div>
 </div>
 
 <script src="admin.js"></script>

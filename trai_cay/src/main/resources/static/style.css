@@ -1141,35 +1141,6 @@ body {
     text-align:center;
 }
 
-.cart-summary-card{
-    background:#fff;
-    border:1px solid #e5e5e5;
-    padding:25px;
-}
-
-.summary-line{
-    display:flex;
-    justify-content:space-between;
-    padding:15px 0;
-    border-bottom:1px solid #eee;
-}
-
-.total-line{
-    font-size:22px;
-    font-weight:bold;
-}
-
-.btn-checkout-primary{
-    width:100%;
-    padding:18px;
-    margin-top:20px;
-    background:#F2994A;
-    color:#fff;
-    border:none;
-    cursor:pointer;
-    font-size:18px;
-    font-weight:600;
-}
 
 .cart-actions{
     display:flex;
@@ -1249,26 +1220,7 @@ body {
     margin-bottom: 20px;
 }
 
-.coupon-input {
-    display: flex;
-    gap: 10px;
-}
 
-.coupon-input input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-}
-
-.btn-apply {
-    background-color: #4A7C2C;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-}
 
 .btn-checkout {
     width: 100%;
@@ -3100,13 +3052,6 @@ body {
 .free-ship i { margin-right: 4px; }
 .discount-value { color: #e74c3c; font-weight: 600; }
 
-.grand-total {
-    font-size: 18px;
-    font-weight: 700;
-    color: #4A7C2C;
-    padding-top: 12px;
-    border-top: 2px solid #eef5ea;
-}
 
 /* Cam kết */
 .checkout-guarantees {
@@ -3243,37 +3188,6 @@ body {
     border: none;
 }
 
-.cart-summary-card {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-}
-
-
-
-.total-line {
-    font-size: 24px;
-    font-weight: bold;
-    color: #4A7C2C;
-    border-bottom: none;
-    margin-top: 10px;
-}
-
-.btn-checkout-primary {
-    width: 100%;
-    padding: 18px;
-    margin-top: 25px;
-    background: #F2994A;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-}
 
 .btn-checkout-primary:hover {
     background: #e68a3a;
@@ -3432,10 +3346,6 @@ body {
     top: 130px; /* Cố định khối này chạy theo khi cuộn màn hình */
 }
 
-.order-summary-card {
-    border: 1.5px solid #dce4d7;
-    background: #fff;
-}
 
 .order-items {
     max-height: 250px;
@@ -3466,12 +3376,6 @@ body {
     border-bottom: none;
 }
 
-/* Khối Mã Ưu Đãi */
-.coupon-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
 
 .coupon-row input {
     flex: 1;
@@ -3481,28 +3385,12 @@ body {
     font-size: 14px;
 }
 
-.btn-apply-coupon {
-    background: #4A7C2C;
-    color: #fff;
-    border: none;
-    padding: 0 22px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
+
 
 .btn-apply-coupon:hover {
     background: #367018;
 }
 
-/* Phần Tính Tổng Chi Phí */
-.order-totals {
-    border-top: 1px solid #eef2eb;
-    padding-top: 16px;
-    margin-bottom: 20px;
-}
 
 .total-row {
     display: flex;
@@ -3513,39 +3401,7 @@ body {
     color: #555;
 }
 
-.grand-total {
-    border-top: 2px dashed #dce4d7;
-    padding-top: 18px;
-    margin-top: 6px;
-    font-size: 16px;
-    color: #333;
-    font-weight: 600;
-}
 
-#checkout-total {
-    font-size: 26px;
-    font-weight: 700;
-    color: #4A7C2C;
-}
-
-/* Nút Đặt Hàng Chính */
-.btn-place-order {
-    width: 100%;
-    padding: 16px;
-    background: #F2994A;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 14px rgba(242, 153, 74, 0.35);
-}
 
 .btn-place-order:hover {
     background: #e08532;
@@ -3978,3 +3834,253 @@ body {
     transition: background 0.2s; white-space: nowrap;
 }
 .btn-view-order-detail:hover { background: #dcfce7; }
+/* =========================================================
+   GIAO DIỆN TỔNG CỘNG GIỎ HÀNG (HIỆN ĐẠI & CHUYÊN NGHIỆP)
+   ========================================================= */
+
+.cart-summary-card {
+    background: #fff;
+    border: 1px solid #eef3ea !important;
+    border-radius: 20px !important;
+    padding: 30px !important;
+    box-shadow: 0 10px 35px rgba(74, 124, 44, 0.08) !important;
+}
+
+.cart-summary-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1d3d1b;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #e0e0e0;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 !important;
+    color: #555;
+    font-size: 15px;
+}
+
+.total-line {
+    font-size: 18px !important;
+    font-weight: 700;
+    color: #333 !important;
+    margin-top: 10px !important;
+    padding-top: 18px !important;
+    border-top: 2px solid #eef3ea !important;
+}
+
+.total-line strong {
+    font-size: 26px !important;
+    color: #4A7C2C !important;
+}
+
+.btn-checkout-primary {
+    width: 100%;
+    padding: 16px !important;
+    margin-top: 25px !important;
+    background: #4A7C2C !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 18px rgba(74, 124, 44, 0.25);
+}
+
+.btn-checkout-primary:hover {
+    background: #367018 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(74, 124, 44, 0.35);
+}
+
+.btn-checkout-primary:active {
+    transform: translateY(0);
+}
+
+.coupon-input {
+    display: flex;
+    gap: 8px !important;
+    margin-top: 12px;
+}
+
+.coupon-input input {
+    flex: 1;
+    padding: 12px 16px !important;
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fafafa;
+}
+
+.coupon-input input:focus {
+    border-color: #4A7C2C !important;
+    background: #fff;
+}
+
+.btn-apply {
+    background-color: #f4fbf1 !important;
+    color: #4A7C2C !important;
+    border: 1.5px solid #4A7C2C !important;
+    padding: 0 20px !important;
+    border-radius: 8px !important;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+
+.btn-apply:hover {
+    background-color: #4A7C2C !important;
+    color: #fff !important;
+}
+/* Khung viền và Đổ bóng */
+.order-summary-card {
+    background: #fff !important;
+    border: 1px solid #eef3ea !important;
+    border-radius: 20px !important;
+    padding: 30px !important;
+    box-shadow: 0 10px 35px rgba(74, 124, 44, 0.08) !important;
+}
+
+.checkout-card-header {
+    border-bottom: 1px dashed #e0e0e0 !important;
+    padding-bottom: 15px !important;
+    margin-bottom: 20px !important;
+}
+
+.checkout-card-header h3 {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #1d3d1b !important;
+}
+
+/* Danh sách sản phẩm */
+.order-items .order-item {
+    padding: 15px 0 !important;
+    border-bottom: 1px dashed #eef3ea !important;
+    font-size: 14.5px !important;
+    color: #444 !important;
+}
+
+.order-item-qty {
+    background: #f4fbf1 !important;
+    color: #4A7C2C !important;
+    font-weight: 700 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+}
+
+/* Khối nhập mã ưu đãi (Đồng bộ nút Outline với giỏ hàng) */
+.coupon-row {
+    display: flex !important;
+    gap: 10px !important;
+    margin: 20px 0 !important;
+}
+
+.coupon-row input {
+    flex: 1;
+    padding: 12px 16px !important;
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    background: #fafafa !important;
+    transition: border-color 0.2s;
+    outline: none;
+}
+
+.coupon-row input:focus {
+    border-color: #4A7C2C !important;
+    background: #fff !important;
+}
+
+.btn-apply-coupon {
+    background-color: #f4fbf1 !important;
+    color: #4A7C2C !important;
+    border: 1.5px solid #4A7C2C !important;
+    padding: 0 20px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    transition: all 0.25s ease !important;
+    white-space: nowrap;
+}
+
+.btn-apply-coupon:hover {
+    background-color: #4A7C2C !important;
+    color: #fff !important;
+}
+
+/* Khối tính tiền (Tạm tính, phí ship, tổng cộng) */
+.order-totals {
+    border-top: none !important;
+    padding-top: 0 !important;
+    margin-bottom: 25px !important;
+}
+
+.total-row {
+    padding: 8px 0 !important;
+    color: #555 !important;
+    font-size: 15px !important;
+}
+
+/* Ép phần "Tổng cộng" hiển thị cực kỳ chuyên nghiệp */
+.grand-total {
+    border-top: 2px solid #eef3ea !important;
+    padding-top: 18px !important;
+    margin-top: 10px !important;
+}
+
+.grand-total span:first-child {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #333 !important; /* Chữ "Tổng cộng" màu đen xám */
+}
+
+#checkout-total {
+    font-size: 26px !important;
+    font-weight: 700 !important;
+    color: #4A7C2C !important; /* Số tiền màu xanh to bản */
+}
+
+/* Nút ĐẶT HÀNG (Thay thế nút cam cũ) */
+.btn-place-order {
+    width: 100% !important;
+    padding: 16px !important;
+    background: #4A7C2C !important; /* Đổi về màu xanh thương hiệu */
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 6px 18px rgba(74, 124, 44, 0.25) !important;
+}
+
+.btn-place-order:hover {
+    background: #367018 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(74, 124, 44, 0.35) !important;
+}
+
+.btn-place-order:active {
+    transform: translateY(0) !important;
+}

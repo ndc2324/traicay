@@ -972,32 +972,27 @@ paymentMethod: (document.querySelector('input[name="payment"]:checked')?.value |
         return res.json();
     })
    // ... Đoạn code fetch('/api/orders') bên trên giữ nguyên ...
-       .then(savedOrder => {
-           // Xóa giỏ hàng khi đặt hàng thành công
-           cart = [];
-           updateCartBadge();
-           saveCart();
-           renderCart();
-           renderCheckout();
+     .then(savedOrder => {
+                // Xóa giỏ hàng khi đặt hàng thành công
+                cart = [];
+                updateCartBadge();
+                saveCart();
+                renderCart();
+                renderCheckout();
 
-           // Reset form nhập liệu thông tin
-           document.getElementById('order-form')?.reset();
+                // Reset form nhập liệu thông tin
+                document.getElementById('order-form')?.reset();
 
-           // 1. Hiển thị modal thông báo đặt hàng thành công (Ảnh 1)
-           showOrderSuccessModal(savedOrder);
+                // 1. Hiển thị modal thông báo đặt hàng thành công (Ảnh 1)
+                showOrderSuccessModal(savedOrder);
 
-           // 2. THÊM ĐOẠN NÀY: Tự động tắt modal và lớp nền mờ sau 1 giây (1000ms)
-           setTimeout(() => {
-               closeOrderSuccessModal();
-               // Sau khi ẩn thông báo, bạn có thể tự động chuyển họ về trang chủ
-               // hoặc giữ nguyên tại trang checkout tùy bạn. Nếu muốn về trang chủ:
-               // navigateTo('home');
-           }, 1000);
-       })
-       .catch(error => {
-           console.error('Lỗi chi tiết từ hệ thống:', error);
-           alert('Có lỗi xảy ra trong quá trình đặt hàng.');
-       });
+
+                setTimeout(() => {
+                    closeOrderSuccessModal();
+
+                    navigateTo('home');
+                }, 1000);
+            })
 }
 
 function showOrderConfirmation(data) {
