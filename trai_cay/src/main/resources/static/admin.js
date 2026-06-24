@@ -137,13 +137,18 @@ function renderCategoryTable(categories) {
     }
 
     categories.forEach(category => {
+        // Đếm số lượng sản phẩm thực tế thuộc về danh mục này
+        const productCount = adminProducts.filter(p => p.category && p.category.id === category.id).length;
+
+        // Ưu tiên số liệu từ Backend nếu Backend có trả về trường productCount, nếu không dùng số vừa đếm
+        const displayCount = category.productCount !== undefined ? category.productCount : productCount;
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${category.id}</td>
             <td>${category.name}</td>
             <td>${category.description || 'Không có mô tả'}</td>
-            <td>${category.products?.length || 0}</td>
-            <td>
+            <td><strong>${displayCount}</strong></td> <td>
                 <button class="btn-secondary" onclick="editCategory(${category.id})">Sửa</button>
                 <button class="btn-secondary" onclick="deleteCategory(${category.id})">Xóa</button>
             </td>
@@ -192,19 +197,26 @@ function loadAdminOrders(status = 'ALL') {
 }
 
 function loadAdminCategories() {
-    return fetch('/api/categories')
-        .then(response => response.json())
-        .then(categories => {
+    // Gọi song song cả API sản phẩm (nếu chưa có) và API danh mục để lấy dữ liệu đếm số lượng
+    const fetchProducts = adminProducts.length === 0 ?
+        fetch('/api/products/all', { headers: { 'Authorization': 'Bearer ' + authToken } }).then(r => r.json()) :
+        Promise.resolve(adminProducts);
+
+    const fetchCategories = fetch('/api/categories').then(r => r.json());
+
+    return Promise.all([fetchProducts, fetchCategories])
+        .then(([products, categories]) => {
+            // Lưu lại data sản phẩm để dùng cho việc đếm
+            adminProducts = Array.isArray(products) ? products : (products.data || products.content || []);
             adminCategories = categories;
             renderCategoryTable(categories);
             return categories;
         })
         .catch(error => {
-            console.error('Error loading categories:', error);
+            console.error('Error loading data:', error);
             return [];
         });
 }
-
 function populateCategorySelect() {
     const categorySelect = document.getElementById('product-category');
     if (!categorySelect) return;
@@ -359,38 +371,115 @@ function deleteProduct(productId) {
     });
 }
 
-function showAddCategoryForm() {
-    const name = prompt('Tên danh mục:');
-    if (!name) return;
 
-    const description = prompt('Mô tả:');
-    const category = {
+
+// Biến lưu trạng thái đang sửa danh mục nào (null nếu là thêm mới)
+let editingCategoryId = null;
+
+// Hàm mở Modal Danh mục
+function openCategoryModal(category = null) {
+    editingCategoryId = category ? category.id : null;
+
+    // Cập nhật tiêu đề modal
+    document.getElementById('category-modal-title').textContent = category ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới';
+
+    // Reset form sạch sẽ trước khi điền dữ liệu
+    document.getElementById('category-form').reset();
+
+    // Nếu là chế độ Sửa, điền dữ liệu cũ vào các ô input
+    if (category) {
+        document.getElementById('category-name').value = category.name || '';
+        document.getElementById('category-description').value = category.description || '';
+        document.getElementById('category-image-url').value = category.imageUrl || '';
+    }
+
+    // Hiển thị modal
+    document.getElementById('category-modal').classList.add('show');
+}
+
+// Hàm đóng Modal Danh mục
+function closeCategoryModal() {
+    document.getElementById('category-modal').classList.remove('show');
+}
+
+// Hàm được gọi khi bấm nút "+ Thêm danh mục"
+function showAddCategoryForm() {
+    openCategoryModal(null);
+}
+
+// Hàm được gọi khi bấm nút "Sửa" trên từng dòng danh mục
+function editCategory(categoryId) {
+    // Tìm danh mục trong mảng dữ liệu đã load sẵn
+    const category = adminCategories.find(c => c.id === categoryId);
+
+    if (category) {
+        openCategoryModal(category);
+    } else {
+        // Fallback: Nếu không tìm thấy, fetch lại từ API
+        fetch(`/api/categories/${categoryId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Không thể tải dữ liệu danh mục');
+                return response.json();
+            })
+            .then(data => openCategoryModal(data))
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi lấy thông tin danh mục.');
+            });
+    }
+}
+
+// Hàm xử lý khi bấm submit form lưu danh mục
+function submitCategoryForm(event) {
+    event.preventDefault(); // Chặn hành vi reload trang mặc định của form
+
+    const name = document.getElementById('category-name').value.trim();
+    const description = document.getElementById('category-description').value.trim();
+    const imageUrl = document.getElementById('category-image-url').value.trim() || 'https://via.placeholder.com/300';
+
+    if (!name) {
+        alert('Vui lòng nhập tên danh mục.');
+        return;
+    }
+
+    const categoryPayload = {
         name,
-        description: description || '',
-        imageUrl: 'https://via.placeholder.com/300'
+        description,
+        imageUrl
     };
 
-    fetch('/api/categories', {
-        method: 'POST',
+    // Quyết định URL và Phương thức (POST cho thêm mới, PUT cho cập nhật)
+    const url = editingCategoryId ? `/api/categories/${editingCategoryId}` : '/api/categories';
+    const method = editingCategoryId ? 'PUT' : 'POST';
+
+    fetch(url, {
+        method: method,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + authToken
         },
-        body: JSON.stringify(category)
+        body: JSON.stringify(categoryPayload)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text || 'Lỗi khi lưu danh mục.'); });
+        }
+        return response.json();
+    })
     .then(() => {
-        alert('Thêm danh mục thành công!');
-        loadAdminCategories();
+        alert(editingCategoryId ? 'Cập nhật danh mục thành công!' : 'Thêm danh mục mới thành công!');
+        closeCategoryModal();
+        loadAdminCategories(); // Load lại bảng danh mục
+
+        // Load lại cả select box trong form sản phẩm để đồng bộ dữ liệu
+        if (typeof populateCategorySelect === 'function') {
+            populateCategorySelect();
+        }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Lỗi khi thêm danh mục.');
+        alert('Lỗi khi lưu danh mục!');
     });
-}
-
-function editCategory(categoryId) {
-    alert('Chức năng chỉnh sửa danh mục sẽ được thêm vào sau!');
 }
 
 function deleteCategory(categoryId) {
@@ -624,14 +713,13 @@ function loadAdminDashboard() {
         adminProducts = Array.isArray(products) ? products : (products.data || products.content || []);
         adminOrders   = Array.isArray(orders)   ? orders   : (orders.data   || orders.content   || []);
 
-        // Inject demo orders for visualization (only once)
-        if (demoOrdersEnabled && !demoInjected) {
+        // Load dữ liệu ảo dùng cho biểu đồ (không bị mất khi qua tab khác)
+        if (demoOrdersEnabled) {
             const demos = generateDemoOrders();
             adminOrders = adminOrders.concat(demos);
-            demoInjected = true;
         }
 
-        // ---- Stat cards ----
+        // ---- Điền dữ liệu vào các thẻ Stat cards ----
         document.getElementById('stat-products').textContent = adminProducts.length;
         document.getElementById('stat-orders').textContent   = adminOrders.length;
 
@@ -640,9 +728,11 @@ function loadAdminDashboard() {
             .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
         document.getElementById('stat-revenue').textContent = revenue.toLocaleString('vi-VN') + 'đ';
 
-        const uniqueCustomers = new Set(adminOrders.map(o => o.customerName || o.phone || o.email)).size;
-        document.getElementById('stat-customers').textContent = uniqueCustomers;
-
+const completedOrdersCount = adminOrders.filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED').length;
+const statCompletedEl = document.getElementById('stat-completed-orders');
+if (statCompletedEl) {
+    statCompletedEl.textContent = completedOrdersCount;
+}
         const confirmedCount = adminOrders.filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED').length;
         const conversion = adminOrders.length ? Math.round((confirmedCount / adminOrders.length) * 100) : 0;
         document.getElementById('stat-conversion').textContent = conversion + '%';
@@ -654,112 +744,311 @@ function loadAdminDashboard() {
         if (document.getElementById('stat-cancelled-orders'))
             document.getElementById('stat-cancelled-orders').textContent = countByStatus('CANCELLED');
 
-        // ---- Biểu đồ ----
+        // ---- Render các biểu đồ (Đã sửa lỗi ngoặc nhọn ở đây) ----
         setTimeout(() => {
-            // ensure granularity controls and defaults are rendered
-            renderRevenueDateControls();
-            setRevenueChartGranularity(currentRevenueGranularity, document.querySelector('.granularity-controls .chart-filter-btn.active'));
-            drawStatusChart(adminOrders);
-            drawTopProductsChart(adminOrders);
-            renderRecentOrders(adminOrders);
-        }, 100);
+            try {
+                renderRevenueDateControls();
+                const activeBtn = document.querySelector('.granularity-controls .chart-filter-btn.active');
+                setRevenueChartGranularity(currentRevenueGranularity, activeBtn);
+            } catch (e) { console.error("Lỗi dựng biểu đồ doanh thu:", e); }
+
+            try { drawStatusChart(adminOrders); } catch (e) { console.error("Lỗi biểu đồ trạng thái:", e); }
+
+            try {
+                const filterVal = document.getElementById('recent-order-filter')?.value || 'all';
+                filterRecentOrders(filterVal);
+            } catch (e) { console.error("Lỗi đơn hàng gần đây:", e); }
+
+        }, 100); // <--- Chú ý vị trí đóng ngoặc ở đây
     })
     .catch(error => {
         console.error('Error loading dashboard:', error);
-        document.getElementById('stat-products').textContent = adminProducts.length || 0;
+        if(document.getElementById('stat-products')) {
+            document.getElementById('stat-products').textContent = adminProducts.length || 0;
+        }
     });
 }
-
-// ---- Biểu đồ doanh thu theo tháng (clean implementation) ----
-function drawRevenueOverview(orders = [], granularity = 'month', period = 12) {
+// ---- Biểu đồ doanh thu (Mặc định 12 tháng - Chỉ đổi khi chủ động lọc) ----
+// ---- Biểu đồ doanh thu (Cải tiến hiệu ứng Line Chart tách biệt và đổ bóng) ----
+function drawRevenueOverview(orders = [], granularity = 'month', period, startArg, endArg, isFiltered = false) {
     const mainCtx = document.getElementById('revenue-chart');
     if (!mainCtx) return;
 
     const labels = [];
     const revenueData = [];
-    // optional start/end as 4th/5th args
-    const startArg = arguments[3] ? new Date(arguments[3]) : null;
-    const endArg = arguments[4] ? new Date(arguments[4]) : null;
 
-    // If user selected a month/year (we receive an endArg), render full 12 months for that year
-    if (endArg) {
-        const year = endArg.getFullYear();
-        for (let m = 0; m < 12; m++) {
-            labels.push(`T${m+1}`);
+    const start = startArg ? new Date(startArg) : null;
+    const end   = endArg   ? new Date(endArg)   : null;
+
+    if (granularity === 'day' && start && end) {
+        // Lọc theo từng ngày trong khoảng start → end
+        const cursor = new Date(start);
+        while (cursor <= end) {
+            const y = cursor.getFullYear(), m = cursor.getMonth(), d = cursor.getDate();
+            labels.push(`${d}/${m+1}`);
             const rev = orders
                 .filter(o => {
                     const od = new Date(o.createdAt);
-                    return od.getFullYear() === year && od.getMonth() === m;
+                    return od.getFullYear()===y && od.getMonth()===m && od.getDate()===d;
                 })
+                .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
+                .reduce((s, o) => s + (o.totalAmount || 0), 0);
+            revenueData.push(rev);
+            cursor.setDate(cursor.getDate() + 1);
+            if (labels.length > 60) break;
+        }
+    } else if (granularity === 'year' && start && end) {
+        // Lọc theo từng năm
+        for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
+            labels.push(`${y}`);
+            const rev = orders
+                .filter(o => new Date(o.createdAt).getFullYear() === y)
                 .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
                 .reduce((s, o) => s + (o.totalAmount || 0), 0);
             revenueData.push(rev);
         }
     } else {
-        // fallback: last `period` months up to now (but our UI will use 12)
-        const now = new Date();
-        for (let i = period - 1; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            labels.push(`T${d.getMonth() + 1}`);
-            const rev = orders
-                .filter(o => {
-                    const od = new Date(o.createdAt);
-                    return od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth();
-                })
-                .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
-                .reduce((s, o) => s + (o.totalAmount || 0), 0);
-            revenueData.push(rev);
+        // XỬ LÝ CHO GRANULARITY = 'MONTH'
+        const targetDate = end ? new Date(end) : new Date();
+        const targetYear = targetDate.getFullYear();
+
+        if (isFiltered) {
+            const targetMonth = targetDate.getMonth();
+            const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                labels.push(`Ngày ${d}`);
+                const rev = orders
+                    .filter(o => {
+                        const od = new Date(o.createdAt);
+                        return od.getFullYear() === targetYear &&
+                               od.getMonth() === targetMonth &&
+                               od.getDate() === d;
+                    })
+                    .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
+                    .reduce((s, o) => s + (o.totalAmount || 0), 0);
+                revenueData.push(rev);
+            }
+        } else {
+            for (let m = 0; m < 12; m++) {
+                labels.push(`T${m+1}`);
+                const rev = orders
+                    .filter(o => {
+                        const od = new Date(o.createdAt);
+                        return od.getFullYear() === targetYear && od.getMonth() === m;
+                    })
+                    .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
+                    .reduce((s, o) => s + (o.totalAmount || 0), 0);
+                revenueData.push(rev);
+            }
         }
     }
 
+    // Tạo hiệu ứng đổ bóng cho đường thẳng thông qua canvas context plugins
+    const shadowPlugin = {
+        id: 'shadowPlugin',
+        beforeDraw: (chart) => {
+            const { ctx } = chart;
+            ctx.save();
+            // Cấu hình đổ bóng (Shadow) tạo độ nổi 3D tách biệt khỏi cột
+            ctx.shadowColor = 'rgba(46, 204, 113, 0.4)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 6;
+        },
+        afterDraw: (chart) => {
+            chart.ctx.restore();
+        }
+    };
+
     if (revenueChart) revenueChart.destroy();
+
+    const ctx2d = mainCtx.getContext('2d');
+    // Tạo gradient mờ phía dưới đường thẳng tăng tính thẩm mỹ
+    const fadeGradient = ctx2d.createLinearGradient(0, 0, 0, mainCtx.clientHeight);
+    fadeGradient.addColorStop(0, 'rgba(46, 204, 113, 0.15)');
+    fadeGradient.addColorStop(1, 'rgba(46, 204, 113, 0)');
+
     revenueChart = new Chart(mainCtx, {
-        type: 'bar',
+        plugins: [shadowPlugin], // Kích hoạt plugin đổ bóng riêng cho Line
         data: {
             labels,
-            datasets: [{
-                label: 'Doanh thu',
-                data: revenueData,
-                backgroundColor: '#1e4f1f',
-                borderRadius: 8,
-                barPercentage: 0.6
-            }]
+            datasets: [
+                {
+                    // --- ĐƯỜNG XU HƯỚNG CẢI TIẾN ---
+                    type: 'line',
+                    label: 'Xu hướng',
+                    data: revenueData,
+                    borderColor: '#2ecc71',         // Màu neon lục sáng bắt mắt
+                    borderWidth: 4,                 // Làm dày đường nét
+                    pointBackgroundColor: '#ffffff', // Tâm điểm tròn màu trắng
+                    pointBorderColor: '#2ecc71',    // Viền điểm màu xanh lục
+                    pointBorderWidth: 3,
+                    pointRadius: 5,                 // Điểm tròn mặc định to hơn
+                    pointHoverRadius: 8,            // Phóng to điểm rõ rệt khi hover
+                    pointHoverBackgroundColor: '#2ecc71',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3,
+                    tension: 0.35,                  // Tăng độ uốn lượn mềm mượt nghệ thuật hơn
+                    fill: true,                     // Bật màu phủ gradient dưới đường thẳng
+                    backgroundColor: fadeGradient,
+                    order: 1                        // Đặt thứ tự vẽ lên hàng đầu (nổi trên cột)
+                },
+                {
+                    // --- CỘT DOANH THU GỐC ---
+                    type: 'bar',
+                    label: 'Doanh thu',
+                    data: revenueData,
+                    backgroundColor: '#1e4f1f',
+                    borderRadius: 6,
+                    barPercentage: isFiltered ? 0.7 : 0.6,
+                    order: 2                        // Vẽ nằm phía sau đường line
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            // Thêm hiệu ứng Animation mượt mà khi render
+            animations: {
+                y: {
+                    easing: 'easeInOutQuart',
+                    duration: 1000,
+                    from: (ctx) => {
+                        if (ctx.type === 'data') {
+                            if (ctx.mode === 'default' && !ctx.hadStarted) {
+                                ctx.hadStarted = true;
+                                return 0;
+                            }
+                        }
+                    }
+                }
+            },
             plugins: {
                 legend: { display: false },
                 tooltip: {
+                    backgroundColor: '#112d18',     // Đổi nền tooltip tối màu cực sang
+                    titleColor: '#ffffff',
+                    bodyColor: '#ffffff',
+                    padding: 10,
+                    cornerRadius: 8,
                     callbacks: {
-                        title: (items) => {
-                            const idx = items[0].dataIndex + 1;
-                            const year = endArg ? endArg.getFullYear().toString().slice(2) : (new Date()).getFullYear().toString().slice(2);
-                            return `T${idx}/${year}`;
-                        },
-                        label: (ctx) => ` ${ctx.raw.toLocaleString('vi-VN')}đ`
+                        label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw.toLocaleString('vi-VN')}đ`
                     }
                 }
             },
             scales: {
-                x: { grid: { display: false }, ticks: { maxRotation: 0 } },
-                y: { min: 0, max: 6000000, ticks: { stepSize: 2000000, callback: v => (v/1000000) + 'M' }, grid: { color: 'rgba(0,0,0,0.04)' } }
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        maxRotation: 45,
+                        callback: function(val, index) {
+                            if (!isFiltered) return this.getLabelForValue(val);
+                            return index % 3 === 0 ? this.getLabelForValue(val) : '';
+                        }
+                    }
+                },
+                y: {
+                    min: 0,
+                    ticks: {
+                        callback: v => {
+                            if (v >= 1000000) return (v/1000000).toFixed(1) + 'M';
+                            if (v >= 1000) return (v/1000).toFixed(0) + 'K';
+                            return v;
+                        }
+                    },
+                    grid: { color: 'rgba(0,0,0,0.04)' }
+                }
             }
         }
     });
 
-    // update KPI and change
+    // Cập nhật số tổng KPI hiển thị phía trên
     const total = revenueData.reduce((s, v) => s + v, 0);
     const kpiEl = document.getElementById('revenue-kpi');
     if (kpiEl) kpiEl.textContent = total.toLocaleString('vi-VN') + 'đ';
-    const changeEl = document.getElementById('revenue-kpi-change');
-    if (changeEl) {
-        const last = revenueData[11] || 0;
-        const prev = revenueData[10] || 0;
-        const pct = prev ? Math.round(((last - prev) / prev) * 100) : 0;
-        changeEl.textContent = `${pct >= 0 ? '+' + pct + '%' : pct + '%'} ${pct >= 0 ? '▲' : '▼'} (so với tháng trước)`;
-    }
-}
+
+    // Xử lý nhãn hiển thị tăng trưởng phần trăm (%)
+   const changeEl = document.getElementById('revenue-kpi-change');
+       if (changeEl) {
+           const targetDate = end ? new Date(end) : new Date();
+           const targetYear = targetDate.getFullYear();
+           const targetMonth = targetDate.getMonth(); // 0 - 11
+
+           let currentPeriodRevenue = 0;
+           let prevPeriodRevenue = 0;
+           let labelText = "";
+
+           if (!isFiltered) {
+               // TRẠNG THÁI 1: TỔNG QUAN CẢ NĂM
+               // Tự động tìm tháng mới nhất đang có doanh thu
+               let latestMonthIndex = 11;
+               for (let i = 11; i >= 0; i--) {
+                   if (revenueData[i] > 0) {
+                       latestMonthIndex = i;
+                       break;
+                   }
+               }
+
+               currentPeriodRevenue = revenueData[latestMonthIndex];
+               // Lấy doanh thu của tháng liền trước đó
+               prevPeriodRevenue = latestMonthIndex > 0 ? revenueData[latestMonthIndex - 1] : 0;
+
+               // Xử lý nhãn text (Ví dụ đang ở T6 thì so sánh với T5)
+               let prevMonthLabel = latestMonthIndex === 0 ? "12" : (latestMonthIndex).toString();
+               labelText = `so với T${prevMonthLabel}`;
+
+           } else {
+               // TRẠNG THÁI 2: ĐÃ CHỌN LỌC 1 THÁNG CỤ THỂ
+               currentPeriodRevenue = total;
+
+               // Lùi lại 1 tháng để lấy mốc thời gian so sánh
+               let prevMonth = targetMonth - 1;
+               let prevYear = targetYear;
+               if (prevMonth < 0) {
+                   prevMonth = 11;
+                   prevYear--;
+               }
+
+               // Tính tổng tiền của tháng liền trước
+               prevPeriodRevenue = orders
+                   .filter(o => {
+                       const od = new Date(o.createdAt);
+                       return od.getFullYear() === prevYear && od.getMonth() === prevMonth;
+                   })
+                   .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
+                   .reduce((s, o) => s + (o.totalAmount || 0), 0);
+
+               labelText = "so với tháng trước";
+           }
+
+           // --- TÍNH TOÁN VÀ HIỂN THỊ PHẦN TRĂM (%) ---
+           if (currentPeriodRevenue === 0 && prevPeriodRevenue === 0) {
+               changeEl.textContent = `0% (${labelText})`;
+               changeEl.style.color = '#7b8b82'; // Màu xám nếu không có biến động
+               changeEl.style.background = '#f1f6ef';
+           } else if (prevPeriodRevenue === 0) {
+               changeEl.textContent = `+100% ▲ (${labelText})`;
+               changeEl.style.color = '#2f7f2f';
+               changeEl.style.background = '#eaf7ea';
+           } else {
+               const pct = Math.round(((currentPeriodRevenue - prevPeriodRevenue) / prevPeriodRevenue) * 100);
+               const sign = pct >= 0 ? '+' : '';
+               const arrow = pct >= 0 ? '▲' : '▼';
+
+               changeEl.textContent = `${sign}${pct}% ${arrow} (${labelText})`;
+
+               // Cập nhật màu sắc: Xanh lá nếu tăng/giữ nguyên, Đỏ nếu giảm
+               if (pct >= 0) {
+                   changeEl.style.color = '#2f7f2f';
+                   changeEl.style.background = '#eaf7ea';
+               } else {
+                   changeEl.style.color = '#c0392b';
+                   changeEl.style.background = '#fdecea';
+               }
+           }
+       }
+   }
 
 function setRevenueChartPeriod(period, btn) {
     currentRevenuePeriod = period;
@@ -769,88 +1058,100 @@ function setRevenueChartPeriod(period, btn) {
 
 function setRevenueChartGranularity(granularity, btn) {
     currentRevenueGranularity = granularity;
-    // toggle granularity buttons
-    document.querySelectorAll('.granularity-controls .chart-filter-btn').forEach(b=>b.classList.remove('active'));
+    // Khởi tạo active class cho nút phân loại
+    document.querySelectorAll('.granularity-controls .chart-filter-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
 
-    // always render a single calendar picker; chart will show fixed 12 months ending at selected date
+    // Vẽ bộ điều khiển ngày tương ứng
     renderRevenueDateControls();
-    // default: show last 12 months ending now
+
     const now = new Date();
     const end = new Date(now.getFullYear(), now.getMonth(), 1);
     const start = new Date(end.getFullYear(), end.getMonth() - 11, 1);
-    drawRevenueOverview(adminOrders, 'month', null, start, end);
+
+    // Đảm bảo truyền tham số thứ 6 (isFiltered) là false để kích hoạt biểu đồ 12 tháng mặc định
+    drawRevenueOverview(adminOrders, granularity, null, start, end, false);
 }
 
 function renderRevenueDateControls() {
     const container = document.getElementById('revenue-date-controls');
     if (!container) return;
     container.innerHTML = '';
-    // single input: opens native calendar; on change, chart shows 12 months ending at chosen date
+
     if (currentRevenueGranularity === 'day') {
-        const inp = document.createElement('input'); inp.type = 'date'; inp.id = 'rev-single-date'; inp.title = 'Chọn ngày';
-        inp.onchange = () => {
-            const v = inp.value; if (!v) return;
-            const end = new Date(v);
-            const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
-            const start = new Date(endMonth.getFullYear(), endMonth.getMonth() - 11, 1);
-            drawRevenueOverview(adminOrders, 'month', null, start, endMonth);
-        };
-        // default to today
-        const today = new Date();
-        inp.value = today.toISOString().slice(0,10);
-        container.appendChild(inp);
+        // Chọn khoảng ngày: từ ngày → đến ngày
+        const now = new Date();
+        const todayStr = now.toISOString().slice(0, 10);
+        const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+
+        container.innerHTML = `
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <input type="date" id="rev-day-start" value="${monthAgo}" style="padding:6px 8px;border-radius:8px;border:1px solid #e6efe6;background:#fbfff9;">
+                <span style="color:#888">→</span>
+                <input type="date" id="rev-day-end" value="${todayStr}" style="padding:6px 8px;border-radius:8px;border:1px solid #e6efe6;background:#fbfff9;">
+                <button onclick="applyDayFilter()" style="padding:6px 12px;border-radius:999px;background:#1a8d3e;color:#fff;border:none;cursor:pointer;font-size:13px;">Lọc</button>
+            </div>
+        `;
+
     } else if (currentRevenueGranularity === 'month') {
-        const inp = document.createElement('input'); inp.type = 'month'; inp.id = 'rev-single-month'; inp.title = 'Chọn tháng';
-        inp.onchange = () => {
-            const v = inp.value; if (!v) return;
-            const [y,m] = v.split('-').map(Number);
-            const endMonth = new Date(y, m-1, 1);
-            const start = new Date(endMonth.getFullYear(), endMonth.getMonth() - 11, 1);
-            drawRevenueOverview(adminOrders, 'month', null, start, endMonth);
-        };
-        // default to current month
+        // Chọn năm để xem T1-T12
         const now = new Date();
         const defaultVal = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
-        inp.value = defaultVal;
-        container.appendChild(inp);
+        container.innerHTML = `
+            <input type="month" id="rev-single-month" value="${defaultVal}"
+                style="padding:6px 8px;border-radius:8px;border:1px solid #e6efe6;background:#fbfff9;font-size:14px;"
+                onchange="applyMonthFilter(this.value)">
+        `;
+
     } else if (currentRevenueGranularity === 'year') {
-        // use a month input to select a month within the year (native calendar fallback), then show 12 months ending that month
-        const inp = document.createElement('input'); inp.type = 'month'; inp.id = 'rev-single-year-month'; inp.title = 'Chọn năm (mở lịch và chọn bất kỳ tháng trong năm)';
-        inp.onchange = () => {
-            const v = inp.value; if (!v) return;
-            const [y,m] = v.split('-').map(Number);
-            const endMonth = new Date(y, m-1, 1);
-            const start = new Date(endMonth.getFullYear(), endMonth.getMonth() - 11, 1);
-            drawRevenueOverview(adminOrders, 'month', null, start, endMonth);
-        };
-        container.appendChild(inp);
+        // Chọn khoảng năm
+        const now = new Date();
+        container.innerHTML = `
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="number" id="rev-year-start" value="${now.getFullYear()-3}" min="2000" max="2099"
+                    style="width:80px;padding:6px 8px;border-radius:8px;border:1px solid #e6efe6;background:#fbfff9;">
+                <span style="color:#888">→</span>
+                <input type="number" id="rev-year-end" value="${now.getFullYear()}" min="2000" max="2099"
+                    style="width:80px;padding:6px 8px;border-radius:8px;border:1px solid #e6efe6;background:#fbfff9;">
+                <button onclick="applyYearFilter()" style="padding:6px 12px;border-radius:999px;background:#1a8d3e;color:#fff;border:none;cursor:pointer;font-size:13px;">Lọc</button>
+            </div>
+        `;
     }
 }
-
 // Generate some demo orders across months to visualize charts locally
 function generateDemoOrders() {
     const demo = [];
     const now = new Date();
-    const idsStart = 100;
-    // create orders for past 6 months and a few other months
-    for (let m = 0; m < 8; m++) {
-        const d = new Date(now.getFullYear(), now.getMonth() - m, Math.min(10 + m, 25));
-        const order = {
-            id: idsStart + m,
-            customerName: 'Demo User ' + (m+1),
-            createdAt: d.toISOString(),
-            status: m % 3 === 0 ? 'CONFIRMED' : 'DELIVERED',
-            totalAmount: 50000 + (m * 45000),
-            items: [{ name: 'Táo', quantity: 1, price: 30000 }, { name: 'Cam', quantity: 2, price: 10000 }]
-        };
-        demo.push(order);
-    }
-    // some older months
-    for (let m = 4; m < 12; m += 3) {
-        const d = new Date(now.getFullYear(), now.getMonth() - m - 2, 15);
-        demo.push({ id: idsStart + 50 + m, customerName: 'DemoUser', createdAt: d.toISOString(), status: 'DELIVERED', totalAmount: 120000 + (m*10000), items: [{name:'Xoài', quantity:2, price:60000}] });
-    }
+    const year = now.getFullYear();
+    let id = 200;
+
+    // Dữ liệu fake theo từng tháng trong năm hiện tại
+    const monthlyData = [
+        { month: 0, count: 3, amounts: [850000, 1200000, 950000] },           // T1
+        { month: 1, count: 4, amounts: [1500000, 800000, 2200000, 650000] },  // T2
+        { month: 2, count: 5, amounts: [900000, 1800000, 3200000, 750000, 1100000] }, // T3
+        { month: 3, count: 3, amounts: [2500000, 1350000, 880000] },           // T4
+        { month: 4, count: 6, amounts: [1200000, 900000, 2800000, 1500000, 650000, 3100000] }, // T5
+        { month: 5, count: 2, amounts: [4200000, 7250000] },                   // T6 (thực tế)
+    ];
+
+    monthlyData.forEach(({ month, count, amounts }) => {
+        amounts.forEach((amount, i) => {
+            const day = Math.min(5 + i * 4, 28);
+            demo.push({
+                id: id++,
+                customerName: `Khách hàng Demo ${id}`,
+                createdAt: new Date(year, month, day, 10, 0, 0).toISOString(),
+                status: i % 4 === 3 ? 'CANCELLED' : (i % 2 === 0 ? 'DELIVERED' : 'CONFIRMED'),
+                totalAmount: amount,
+                items: [
+                    { name: 'Táo Fuji', quantity: 2, price: Math.round(amount * 0.4) },
+                    { name: 'Cam Sành', quantity: 3, price: Math.round(amount * 0.6 / 3) }
+                ]
+            });
+        });
+    });
+
     return demo;
 }
 
@@ -1038,4 +1339,56 @@ function renderRecentOrders(orders) {
             </div>
         </div>
     `).join('');
+}
+function applyDayFilter() {
+    const s = document.getElementById('rev-day-start')?.value;
+    const e = document.getElementById('rev-day-end')?.value;
+    if (!s || !e) return alert('Vui lòng chọn ngày bắt đầu và kết thúc');
+    if (s > e) return alert('Ngày bắt đầu phải nhỏ hơn ngày kết thúc');
+    drawRevenueOverview(adminOrders, 'day', null, new Date(s), new Date(e));
+}
+
+function applyMonthFilter(val) {
+    if (!val) return;
+    const [y, m] = val.split('-').map(Number);
+    // Lưu lại mốc thời gian được chọn làm mốc kết thúc (endArg)
+    const selectedMonthDate = new Date(y, m - 1, 1);
+
+    // Gọi hàm và truyền tham số thứ 6 (isFiltered) là true để biểu đồ biết là đang bấm lọc
+    drawRevenueOverview(adminOrders, 'month', null, null, selectedMonthDate, true);
+}
+
+function applyYearFilter() {
+    const ys = parseInt(document.getElementById('rev-year-start')?.value);
+    const ye = parseInt(document.getElementById('rev-year-end')?.value);
+    if (!ys || !ye) return alert('Vui lòng nhập năm');
+    if (ys > ye) return alert('Năm bắt đầu phải nhỏ hơn năm kết thúc');
+    drawRevenueOverview(adminOrders, 'year', null, new Date(ys, 0, 1), new Date(ye, 11, 31));
+}
+// Hàm xử lý lọc đơn hàng gần đây
+function filterRecentOrders(filterType) {
+    if (!adminOrders) return;
+
+    const now = new Date();
+    const todayY = now.getFullYear();
+    const todayM = now.getMonth();
+    const todayD = now.getDate();
+
+    let filtered = adminOrders;
+
+    if (filterType === 'day') {
+        // Lọc đơn hàng sinh ra trong ngày hôm nay
+        filtered = adminOrders.filter(o => {
+            const od = new Date(o.createdAt);
+            return od.getFullYear() === todayY && od.getMonth() === todayM && od.getDate() === todayD;
+        });
+    } else if (filterType === 'month') {
+        // Lọc đơn hàng sinh ra trong tháng này
+        filtered = adminOrders.filter(o => {
+            const od = new Date(o.createdAt);
+            return od.getFullYear() === todayY && od.getMonth() === todayM;
+        });
+    }
+
+    renderRecentOrders(filtered);
 }

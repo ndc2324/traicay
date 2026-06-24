@@ -920,3 +920,22 @@ body {
     font-weight:700;
     font-size:13px;
 }
+.filter-select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #d7e6d4;
+    background: #f3f8ef;
+    color: #1d3d1b;
+    font-size: 13px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.filter-select:hover,
+.filter-select:focus {
+    border-color: #1a8d3e;
+    background: #eaf7ea;
+}

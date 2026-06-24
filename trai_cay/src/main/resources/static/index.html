@@ -732,70 +732,91 @@
         <section id="order-confirmation" class="page-section">
             <div class="confirmation-section">
                 <div class="confirmation-card">
+
+                    <!-- 1. Trạng thái & Lời cảm ơn -->
                     <div class="confirmation-top">
                         <div class="confirmation-icon">
-                            <i class="fas fa-check"></i>
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        <div>
+                        <div class="confirmation-header-text">
                             <p class="confirmation-label">Đặt hàng thành công</p>
-                            <h1>Đơn hàng của bạn đã được tiếp nhận</h1>
-                            <p class="confirmation-message">Cảm ơn bạn đã mua sắm tại Fresh Fruit. Đơn hàng sẽ được xử lý trong vòng 24 giờ và nhân viên sẽ liên hệ để xác nhận giao hàng.</p>
+                            <h1>Cảm ơn bạn đã mua sắm tại Fresh Fruit!</h1>
+                            <p class="confirmation-message">Đơn hàng của bạn đã được tiếp nhận hệ thống và sẽ được xử lý trong thời gian sớm nhất.</p>
                         </div>
                     </div>
 
+                    <!-- 2. Khối thông tin chi tiết (Chia 2 cột) - Đẩy lên ngay sau phần Tiêu đề -->
                     <div class="confirmation-grid">
+                        <!-- Cột trái: Chi tiết mã & hình thức -->
                         <div class="confirmation-summary">
-                            <h2>Chi tiết đơn hàng</h2>
+                            <h2>Mã & Thanh toán</h2>
                             <div class="info-box">
                                 <h3>Mã đơn hàng</h3>
-                                <p id="confirm-order-id">#ORD-2026-001</p>
+                                <p id="confirm-order-id" class="highlight-text">#ORD-2026-001</p>
                             </div>
                             <div class="info-box">
-                                <h3>Tổng tiền</h3>
-                                <p id="confirm-total">0đ</p>
-                            </div>
-                            <div class="info-box">
-                                <h3>Trạng thái đơn hàng</h3>
-                                <p id="confirm-status">Chờ xác nhận</p>
+                                <h3>Thời gian đặt</h3>
+                                <p id="confirm-date">-</p>
                             </div>
                             <div class="info-box">
                                 <h3>Phương thức thanh toán</h3>
-                                <p id="confirm-payment">COD</p>
+                                <p id="confirm-payment">Thanh toán khi nhận hàng (COD)</p>
+                            </div>
+                            <div class="info-box total-box">
+                                <h3>Tổng thanh toán</h3>
+                                <p id="confirm-total" class="grand-price">0đ</p>
                             </div>
                         </div>
 
+                        <!-- Cột phải: Địa chỉ nhận hàng -->
                         <div class="delivery-card">
                             <h2>Thông tin giao hàng</h2>
                             <div class="delivery-details">
-                                <p><strong>Họ tên:</strong> <span id="confirm-name"></span></p>
-                                <p><strong>Số điện thoại:</strong> <span id="confirm-phone"></span></p>
-                                <p><strong>Địa chỉ:</strong> <span id="confirm-address"></span></p>
+                                <div class="detail-item-row">
+                                    <i class="far fa-user"></i>
+                                    <div>
+                                        <label>Người nhận</label>
+                                        <strong id="confirm-name">Nguyễn Đình Chiến</strong>
+                                    </div>
+                                </div>
+                                <div class="detail-item-row">
+                                    <i class="fas fa-phone-alt"></i>
+                                    <div>
+                                        <label>Số điện thoại</label>
+                                        <strong id="confirm-phone">-</strong>
+                                    </div>
+                                </div>
+                                <div class="detail-item-row">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <div>
+                                        <label>Địa chỉ nhận hàng</label>
+                                        <strong id="confirm-address">-</strong>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="order-items-card">
-                        <h2>Sản phẩm đã mua</h2>
-                        <div class="order-items-table">
-                            <div class="order-items-header">
-                                <span>Sản phẩm</span>
-                                <span>Số lượng</span>
-                                <span>Đơn giá</span>
-                                <span>Thành tiền</span>
-                            </div>
-                            <div class="order-items-body" id="confirm-order-items"></div>
+                    <!-- 3. Danh sách sản phẩm trực quan -->
+                    <div class="order-items-card-modern">
+                        <h2>Danh sách sản phẩm đã đặt</h2>
+                        <div class="confirm-products-list" id="confirm-order-items">
+                            <!-- Danh sách sản phẩm tự động sinh bằng JS -->
                         </div>
-                        <p class="order-date-line">Ngày đặt hàng: <strong id="confirm-date">-</strong></p>
                     </div>
 
+                    <!-- 4. Cụm nút hành động -->
                     <div class="confirmation-actions">
-                        <button class="btn-primary" onclick="navigateTo('home')">Tiếp tục mua sắm</button>
-                        <button class="btn-secondary" onclick="navigateTo('profile')">Xem đơn hàng</button>
+                        <button class="btn-primary-action" onclick="navigateTo('home')">
+                            <i class="fas fa-shopping-cart"></i> Tiếp tục mua sắm
+                        </button>
+                        <button class="btn-secondary-action" onclick="navigateTo('profile')">
+                            <i class="far fa-list-alt"></i> Xem lịch sử đơn hàng
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
-
         <section id="login" class="page-section">
             <div class="auth-section">
                 <div class="auth-container">
@@ -960,8 +981,10 @@
                         <h2>Lịch sử đơn hàng</h2>
                         <div class="order-filter-tabs">
                             <span class="f-tab active" onclick="filterOrderTab(this, 'all')">Tất cả</span>
-                            <span class="f-tab" onclick="filterOrderTab(this, 'shipping')">Đang giao</span>
-                            <span class="f-tab" onclick="filterOrderTab(this, 'done')">Hoàn thành</span>
+                            <span class="f-tab" onclick="filterOrderTab(this, 'PENDING')">Chờ xác nhận</span>
+                            <span class="f-tab" onclick="filterOrderTab(this, 'SHIPPED')">Đang giao</span>
+                            <span class="f-tab" onclick="filterOrderTab(this, 'DELIVERED')">Hoàn thành</span>
+                            <span class="f-tab" onclick="filterOrderTab(this, 'CANCELLED')">Đã hủy</span>
                         </div>
                         <div id="order-history">
                             <div class="empty-data-msg">
@@ -1075,48 +1098,31 @@
 
         <div class="order-success-overlay" id="order-success-overlay" onclick="closeOrderSuccessModal()"></div>
         <div class="order-success-modal" id="order-success-modal">
-            <div class="order-success-content">
+            <div class="success-toast-header">
                 <div class="modal-icon"><i class="fas fa-check-circle"></i></div>
-                <h2>Đặt hàng thành công!</h2>
-                <p class="modal-message">Cảm ơn bạn đã mua sắm tại Fresh Fruit. Đơn hàng của bạn đã được tiếp nhận và sẽ được xử lý sớm nhất.</p>
-                <div class="modal-summary">
-                    <div class="modal-summary-row">
-                        <span>Mã đơn hàng</span>
-                        <strong id="modal-order-id">#---</strong>
-                    </div>
-                    <div class="modal-summary-row">
-                        <span>Trạng thái</span>
-                        <strong id="modal-order-status">Chờ xác nhận</strong>
-                    </div>
-                    <div class="modal-summary-row">
-                        <span>Tổng tiền</span>
-                        <strong id="modal-order-total">0đ</strong>
-                    </div>
-                    <div class="modal-summary-row">
-                        <span>Phương thức</span>
-                        <strong id="modal-payment-method">COD</strong>
-                    </div>
-                    <div class="modal-summary-row">
-                        <span>Ngày đặt</span>
-                        <strong id="modal-order-date">-</strong>
-                    </div>
-                    <div class="modal-summary-row">
-                        <span>Khách hàng</span>
-                        <strong id="modal-customer-name">-</strong>
-                    </div>
-                    <div class="modal-summary-row">
-                        <span>Điện thoại</span>
-                        <strong id="modal-customer-phone">-</strong>
-                    </div>
-                    <div class="modal-summary-row">
-                        <span>Địa chỉ</span>
-                        <strong id="modal-customer-address">-</strong>
-                    </div>
+                <div class="success-toast-text">
+                    <h3>Đặt hàng thành công!</h3>
+                    <p>Đơn hàng <strong id="modal-order-id">#---</strong> · <strong id="modal-order-total">0đ</strong></p>
                 </div>
-                <div class="order-success-actions">
-                    <button class="btn-primary" onclick="viewOrderDetailFromModal()">Xem chi tiết đơn hàng</button>
-                    <button class="btn-secondary" onclick="continueShoppingFromModal()">Tiếp tục mua sắm</button>
-                </div>
+                <button class="toast-close-btn" onclick="closeOrderSuccessModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="success-toast-footer">
+                <div class="toast-progress-bar" id="toast-progress-bar"></div>
+                <button class="toast-view-order-btn" onclick="goToMyOrders()">
+                    <i class="fas fa-box-open"></i> Xem đơn hàng của tôi
+                </button>
+            </div>
+        </div>
+        <!-- Order Detail Modal -->
+        <div class="odm-overlay" id="order-detail-modal-overlay" onclick="closeOrderDetailModal()"></div>
+        <div class="odm-modal" id="order-detail-modal">
+            <div class="odm-modal-inner">
+                <button class="odm-close-btn" onclick="closeOrderDetailModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div id="order-detail-modal-body"></div>
             </div>
         </div>
     </main>

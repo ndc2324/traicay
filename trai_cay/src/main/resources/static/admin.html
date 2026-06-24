@@ -54,10 +54,7 @@
         </header>
 
         <main class="content-area">
-            <!-- ================================================================
-     THAY THẾ <section id="admin-dashboard" class="panel active">
-     trong file admin.html bằng đoạn code dưới đây
-     ================================================================ -->
+
 
             <section id="admin-dashboard" class="panel active">
 
@@ -79,16 +76,15 @@
                         <span class="stat-caption">Tổng doanh thu xác nhận</span>
                     </div>
                     <div class="stat-card">
-                        <h3>Khách hàng</h3>
-                        <p id="stat-customers" class="stat-number">0</p>
-                        <span class="stat-caption">Khách hàng độc nhất</span>
+                        <h3>Tổng hợp đơn</h3>
+                        <p id="stat-completed-orders" class="stat-number">0</p>
+                        <span class="stat-caption">Đơn hàng hoàn thành / Đã giao</span>
                     </div>
                 </div>
 
                 <!-- ===== KHU VỰC BIỂU ĐỒ ===== -->
                 <div class="charts-grid">
 
-                    <!-- Biểu đồ doanh thu (tổng quan) -->
                     <div class="chart-card chart-card-wide revenue-widget">
                         <div class="revenue-header">
                             <div class="revenue-left">
@@ -106,7 +102,6 @@
                                     <button class="chart-filter-btn" onclick="setRevenueChartGranularity('year', this)">Năm</button>
                                 </div>
                                 <div class="revenue-picker" id="revenue-date-controls">
-                                    <!-- single month picker rendered dynamically -->
                                 </div>
                             </div>
                         </div>
@@ -116,7 +111,6 @@
                         </div>
                     </div>
 
-                    <!-- Biểu đồ trạng thái đơn hàng -->
                     <div class="chart-card">
                         <div class="chart-card-header">
                             <div>
@@ -130,35 +124,23 @@
                         <div id="status-legend" class="chart-legend"></div>
                     </div>
 
-                </div>
-
-                <!-- Hàng 2: Top sản phẩm + Đơn hàng gần đây -->
-                <div class="charts-grid">
-
-                    <!-- Top sản phẩm bán chạy -->
-                    <div class="chart-card">
-                        <div class="chart-card-header">
-                            <div>
-                                <h4>Top sản phẩm bán chạy</h4>
-                                <p>Dựa trên số lượng đặt hàng</p>
-                            </div>
-                        </div>
-                        <canvas id="top-products-chart" height="200"></canvas>
-                    </div>
-
-                    <!-- Đơn hàng gần đây -->
-                    <div class="chart-card">
+                    <div class="chart-card" style="display: flex; flex-direction: column;">
                         <div class="chart-card-header">
                             <div>
                                 <h4>Đơn hàng gần đây</h4>
                                 <p>5 đơn hàng mới nhất</p>
                             </div>
-                            <button class="btn-secondary" onclick="showAdminTab('orders', {currentTarget: document.querySelectorAll('.sidebar-link')[2]})">
-                                Xem tất cả
-                            </button>
+                            <select id="recent-order-filter" class="filter-select" onchange="filterRecentOrders(this.value)">
+                                <option value="all">Tất cả</option>
+                                <option value="day">Hôm nay</option>
+                                <option value="month">Tháng này</option>
+                            </select>
                         </div>
-                        <div id="recent-orders-list" class="recent-orders-list">
+                        <div id="recent-orders-list" class="recent-orders-list" style="flex: 1;">
                             <p style="color:#aaa; padding:20px; text-align:center;">Đang tải...</p>
+                        </div>
+                        <div style="text-align: center; margin-top: 15px; border-top: 1px solid #f1f5ef; padding-top: 15px;">
+                            <button class="btn-secondary" style="font-size: 13px; padding: 6px 16px;" onclick="showAdminTab('orders', {currentTarget: document.querySelectorAll('.sidebar-link')[2]})">Xem tất cả đơn</button>
                         </div>
                     </div>
 
@@ -406,5 +388,37 @@
 </div>
 
 <script src="admin.js"></script>
+<div class="modal" id="category-modal">
+    <div class="modal-backdrop" onclick="closeCategoryModal()"></div>
+    <div class="modal-card" style="width: min(600px, calc(100% - 40px));">
+        <div class="modal-header">
+            <div>
+                <h3 id="category-modal-title">Thêm danh mục mới</h3>
+                <p>Điền thông tin chi tiết cho danh mục sản phẩm.</p>
+            </div>
+            <button class="btn-close" type="button" onclick="closeCategoryModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="category-form" onsubmit="submitCategoryForm(event)">
+            <div class="modal-body">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="category-name">Tên danh mục <span style="color:red">*</span></label>
+                    <input id="category-name" type="text" placeholder="Ví dụ: Trái cây nhập khẩu" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="category-image-url">URL Ảnh đại diện</label>
+                    <input id="category-image-url" type="text" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label for="category-description">Mô tả chi tiết</label>
+                    <textarea id="category-description" placeholder="Nhập mô tả về danh mục này..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeCategoryModal()">Hủy</button>
+                <button type="submit" class="btn-primary">Lưu danh mục</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>
